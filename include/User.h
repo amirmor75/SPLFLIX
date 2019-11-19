@@ -5,12 +5,14 @@
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
+
 class Watchable;
 class Session;
 
 class User{
 public:
-    User(const std::string& name);
+    User(const std::string &name);
+
     virtual Watchable* getRecommendation(Session& s) = 0;
     std::string getName() const;
     std::vector<Watchable*> get_history() const;
