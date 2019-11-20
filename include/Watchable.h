@@ -13,6 +13,7 @@ public:
     virtual ~Watchable();
     virtual std::string toString() const = 0;
     virtual Watchable* getNextWatchable(Session&) const = 0;
+    virtual Watchable* clone()=0;
 private:
     const long id;
     int length;

@@ -6,6 +6,7 @@
 #include <../include/json.hpp>
 #include <fstream>
 #include <Watchable.h>
+#include <User.h>
 
 //Session Constructor
 Session::Session(const std::string &configFilePath) {
@@ -18,7 +19,7 @@ Session::Session(const std::string &configFilePath) {
     json movies;
     movies=j["movies"];
     for (auto& element : movies){
-        content.push_back(new Movie(content.size(),element["name"],element["length"],element["tags"]));
+        //content.push_back(new Movie(content.size(),element["name"],element["length"],element["tags"]));
     }
     json series;
     series=j["tv_series"];
@@ -42,8 +43,96 @@ Session::Session(const std::string &configFilePath) {
 }
 
 //Session copy constructor
-Session::Session(const Session &session) {
+Session::Session(const Session &other){
+    activeUser=other.activeUser->clone(); //need to implement clone func
+    for(int i=0;i<other.content.size();i++){
+        content.push_back(other.content.at(i));
+    }
+    for(int i=0;i<other.actionsLog.size();i++){
+        actionsLog.push_back(other.actionsLog.at(i));
+    }
+    for (auto& x: other.userMap) {
+        userMap.insert(x);
+    }
+}
 
+Session::Session(Session&& other):
+activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap) {
+    other.activeUser= nullptr;
+    for(int i=0;i<other.content.size();i++){
+        other.content.at(i)= nullptr;
+    }
+    for(int i=0;i<other.actionsLog.size();i++){
+        other.actionsLog.at(i)= nullptr;
+    }
+    for (auto& x: other.userMap) {
+        x.second= nullptr;
+    }
+}
+
+Session& Session::operator=(Session& other) {
+    if(this != &other){
+        delete activeUser;
+        activeUser=other.activeUser->clone();
+        for(int i=0;i<content.size();i++){
+            delete content.at(i);
+        }
+        content.clear();
+        for(int i=0;i<other.content.size();i++){
+            content.push_back(other.content.at(i)->clone());
+        }
+
+        for(int i=0;i<actionsLog.size();i++){
+            delete actionsLog.at(i);
+        }
+        actionsLog.clear();
+        for(int i=0;i<other.actionsLog.size();i++){
+            actionsLog.push_back(other.actionsLog.at(i)->clone());
+        }
+
+        for (auto& x: userMap) {
+            delete x.second;
+        }
+        userMap.clear();
+        for (auto& x: other.userMap) {
+            userMap.insert(x);
+        }
+    }
+    return (*this);
+}
+
+Session& Session::operator=(Session &&other) {
+    if(this!=&other){
+        delete activeUser;
+        activeUser=other.activeUser;
+        delete other.activeUser;
+
+        for(int i=0;i<content.size();i++){
+            delete content.at(i);
+        }
+        content=other.content; //shallow copy
+        for(int i=0;i<other.content.size();i++){
+            delete other.content.at(i);
+        }
+
+        for(int i=0;i<actionsLog.size();i++){
+            delete actionsLog.at(i);
+        }
+        actionsLog=other.actionsLog; //shallow copy
+        for(int i=0;i<other.actionsLog.size();i++){
+            delete other.actionsLog.at(i);
+        }
+
+        for (auto& x: userMap) {
+            delete x.second;
+        }
+        userMap=other.userMap; //shallow copy
+        for (auto& x: other.userMap) {
+            delete x.second;
+        }
+
+    }
+    return (*this);
 }
 
 Session::~Session() {
@@ -59,6 +148,7 @@ Session::~Session() {
     delete activeUser;
 }
 
+
 std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog&}
 User& Session::getActiveUser() { return  activeUser&}
 std::vector<Watchable*>& Session::getContent() { return  content&}
@@ -67,6 +157,6 @@ const std::unordered_map<std::string,User*>& Session::getUserMap() { return user
 
 void setActionsLog(std::vector<BaseAction*> newActionLog);
 void setUserMap(std::unordered_map<std::string,User*> newUserMap);
-void setActiveUser(User*){
+void setActiveUser(User*){}
 
 
