@@ -1,4 +1,4 @@
-//
+
 // Created by tal on 19/11/2019.
 //
 
@@ -58,4 +58,15 @@ Session::~Session() {
     }
     delete activeUser;
 }
+
+std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog&}
+User& Session::getActiveUser() { return  activeUser&}
+std::vector<Watchable*>& Session::getContent() { return  content&}
+const std::unordered_map<std::string,User*>& Session::getUserMap() { return userMap&}
+
+
+void setActionsLog(std::vector<BaseAction*> newActionLog);
+void setUserMap(std::unordered_map<std::string,User*> newUserMap);
+void setActiveUser(User*){
+
 
