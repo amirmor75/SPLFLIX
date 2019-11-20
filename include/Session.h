@@ -12,6 +12,7 @@ class Watchable;
 class Session{
 public:
     Session(const std::string &configFilePath);
+    Session(const Session& session);
     ~Session();
     void start();
     std::vector<Watchable*>& getContent();
