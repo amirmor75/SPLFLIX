@@ -17,6 +17,8 @@ public:
 	ActionStatus getStatus() const;
 	virtual void act(Session& sess)=0;
 	virtual std::string toString() const=0;
+	std::string getErrorMsgPublic() const;
+
 protected:
 	void complete();
 	void error(const std::string& errorMsg);

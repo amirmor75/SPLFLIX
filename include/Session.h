@@ -15,13 +15,13 @@ public:
     Session(const Session& session);
     ~Session();
     void start();
-    std::vector<Watchable*>& getContent();
-    std::vector<BaseAction*>& getActionsLog();
+    const std::vector<Watchable*>& getContent();
+    const std::vector<BaseAction*>& getActionsLog();
     const std::unordered_map<std::string,User*>& getUserMap();
-    User& getActiveUser();
-    void setActionsLog(std::vector<BaseAction*> newActionLog);
-    void setUserMap(std::unordered_map<std::string,User*> newUserMap);
-    void setActiveUser(User*);
+    const User& getActiveUser();
+    void addToActionsLog(BaseAction* newAction);
+    void addToUserMap(std::string name,User* newUserMap);
+    void setActiveUser(User* user);
 
 private:
     std::vector<Watchable*> content;

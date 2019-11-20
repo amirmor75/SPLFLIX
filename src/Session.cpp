@@ -59,14 +59,20 @@ Session::~Session() {
     delete activeUser;
 }
 
-std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog&}
-User& Session::getActiveUser() { return  activeUser&}
-std::vector<Watchable*>& Session::getContent() { return  content&}
-const std::unordered_map<std::string,User*>& Session::getUserMap() { return userMap&}
+const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
+const User& Session::getActiveUser() { return  *activeUser;}
+const std::vector<Watchable*>& Session::getContent() { return  content;}
+const std::unordered_map<std::string,User*>& Session::getUserMap() { return userMap;}
 
 
-void setActionsLog(std::vector<BaseAction*> newActionLog);
-void setUserMap(std::unordered_map<std::string,User*> newUserMap);
-void setActiveUser(User*){
+void Session::addToActionsLog(BaseAction* newAction) {
+    this->actionsLog.push_back(newAction);
+}
+void Session::setActiveUser(User* user) {
+    this->activeUser=user;
+}
+void Session::addToUserMap(std::string name, User* newUserMap) {
+    this->userMap.insert({name,newUserMap});
+}
 
 
