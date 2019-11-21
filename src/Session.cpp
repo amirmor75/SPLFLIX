@@ -62,7 +62,10 @@ Session::~Session() {
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
 const User& Session::getActiveUser() { return  *activeUser;}
 const std::vector<Watchable*>& Session::getContent() { return  content;}
-const std::unordered_map<std::string,User*>& Session::getUserMap() { return userMap;}
+User* Session::getUserFromMap(std::string name) {
+    return  userMap.at(name);
+
+}
 
 
 void Session::addToActionsLog(BaseAction* newAction) {
@@ -74,5 +77,7 @@ void Session::setActiveUser(User* user) {
 void Session::addToUserMap(std::string name, User* newUserMap) {
     this->userMap.insert({name,newUserMap});
 }
+std::string& Session::getCurrentCommand() { return currentCommand;}
+void Session::setCurrentCommand(std::string& currentCommand) {this->currentCommand=currentCommand;}
 
 

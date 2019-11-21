@@ -43,8 +43,11 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
 
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name): User(name){}
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) {
+    for (Watchable* show:history){
 
+    }
 }
+
 
 
 
