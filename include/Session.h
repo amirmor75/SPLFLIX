@@ -22,6 +22,7 @@ public:
     const std::vector<BaseAction*>& getActionsLog();
     const std::unordered_map<std::string,User*>& getUserMap();
     const User& getActiveUser();
+    const int getIndexOfContent();
     void setActionsLog(std::vector<BaseAction*>& newActionLog);
     void setUserMap(std::unordered_map<std::string,User*>& newUserMap);
     void setActiveUser(User*);
@@ -31,5 +32,6 @@ private:
     std::vector<BaseAction*> actionsLog;
     std::unordered_map<std::string,User*> userMap;
     User* activeUser;
+    int indexOfContent;
 };
 #endif

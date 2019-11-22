@@ -34,17 +34,24 @@ private:
 class RerunRecommenderUser : public User {
 public:
     RerunRecommenderUser(const std::string& name);
+    RerunRecommenderUser(const std::string& name, int index);
     virtual Watchable* getRecommendation(Session& s);
     User* clone();
 private:
+    int indexOfHistory;
 };
 
 class GenreRecommenderUser : public User {
 public:
     GenreRecommenderUser(const std::string& name);
+    GenreRecommenderUser(const std::string& name, std::unordered_map<std::string,int> tags);
     virtual Watchable* getRecommendation(Session& s);
     User* clone();
+    std::string mostPopTag();
 private:
+    //for each content this user saw, we will increment the amount of tags in this map
+    //in order to know which tag is the most popular
+    std::unordered_map<std::string,int> amountOfTags;
 };
 
 #endif

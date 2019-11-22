@@ -9,7 +9,7 @@
 #include <User.h>
 
 //Session Constructor
-Session::Session(const std::string &configFilePath) {
+Session::Session(const std::string &configFilePath):indexOfContent(0) {
     //activeUser=new User();
     using json= nlohmann::json;
     std::ifstream file(configFilePath);
@@ -30,12 +30,6 @@ Session::Session(const std::string &configFilePath) {
         for (auto &season: element["seasons"]) {
             for (int i = 1; i <= season; i++) {
                 //content.push_back(new Episode(content.size(), element["name"], element["episode_length"],i,seasonIndex, element["tags"]));
-//                std::cout<<content.size()<<"  ";
-//                std::cout<<element["name"]<<"  ";
-//                std::cout<<element["episode_length"]<<"  ";
-//                std::cout<<i<<"  ";
-//                std::cout<<seasonIndex<<"  ";
-//                std::cout<<element["tags"]<< '\n';
             }
             seasonIndex++;
         }
@@ -44,6 +38,7 @@ Session::Session(const std::string &configFilePath) {
 
 //Session copy constructor
 Session::Session(const Session &other){
+    indexOfContent=other.indexOfContent;
     activeUser=other.activeUser->clone(); //need to implement clone func
     for(int i=0;i<other.content.size();i++){
         content.push_back(other.content.at(i));
@@ -57,7 +52,7 @@ Session::Session(const Session &other){
 }
 
 Session::Session(Session&& other):
-activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap) {
+activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), indexOfContent(other.indexOfContent) {
     other.activeUser= nullptr;
     for(int i=0;i<other.content.size();i++){
         other.content.at(i)= nullptr;
@@ -72,6 +67,7 @@ activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog
 
 Session& Session::operator=(Session& other) {
     if(this != &other){
+        indexOfContent=other.indexOfContent;
         delete activeUser;
         activeUser=other.activeUser->clone();
         for(int i=0;i<content.size();i++){
@@ -103,6 +99,7 @@ Session& Session::operator=(Session& other) {
 
 Session& Session::operator=(Session &&other) {
     if(this!=&other){
+        indexOfContent=other.indexOfContent;
         delete activeUser;
         activeUser=other.activeUser;
         delete other.activeUser;
@@ -130,7 +127,6 @@ Session& Session::operator=(Session &&other) {
         for (auto& x: other.userMap) {
             delete x.second;
         }
-
     }
     return (*this);
 }
@@ -152,7 +148,7 @@ const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog; }
 const User& Session::getActiveUser() { return  *activeUser; }
 const std::vector<Watchable*>& Session::getContent() { return  content; }
 const std::unordered_map<std::string,User*>& Session::getUserMap() { return userMap; }
-
+const int Session::getIndexOfContent() { return indexOfContent; }
 void Session::setActionsLog(std::vector<BaseAction *>& newActionLog) {
     for(auto& base: actionsLog){
         delete base;
