@@ -20,18 +20,23 @@ public:
     void start();
     const std::vector<Watchable*>& getContent();
     const std::vector<BaseAction*>& getActionsLog();
-    const std::unordered_map<std::string,User*>& getUserMap();
+    User* getUserFromMap(std::string name);
     const User& getActiveUser();
-    const int getIndexOfContent();
-    void setActionsLog(std::vector<BaseAction*>& newActionLog);
-    void setUserMap(std::unordered_map<std::string,User*>& newUserMap);
-    void setActiveUser(User*);
+    void addToActionsLog(BaseAction* newAction);
+    void addToUserMap(std::string name,User* newUserMap);
+    void setActiveUser(User* user);
+    std::string& getCurrentCommand();
+    void setCurrentCommand(std::string& currentCommand);  
+    const int getIndexOfContent();    
+
 
 private:
     std::vector<Watchable*> content;
     std::vector<BaseAction*> actionsLog;
     std::unordered_map<std::string,User*> userMap;
     User* activeUser;
+    std::string currentCommand;//the command just written in the main
     int indexOfContent;
+
 };
 #endif

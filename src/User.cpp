@@ -5,28 +5,48 @@
 #include <User.h>
 #include <string>
 #include <cstring>
+#include "Watchable.h"
+#include "Session.h"
 
-//User
+
 User::User(const std::string &name): name(name)
 {}
-std::string User::getName() const { return name; }
-std::vector<Watchable*> User::get_history() const { return history; }
-User* User::clone() {}
+std::string User::getName() const { return name;}
+std::vector<Watchable*> User::get_history() const {return history;}
 
-// Subclasses of User:
 
-//LengthRecommenderUser
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
-Watchable* LengthRecommenderUser::getRecommendation(Session &s)
-{
+
+Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
+    for (int i = 0; i < history.size(); ++i) {
+
+    }
+    int  sum=0;
+    for(Watchable *c : history)
+    {
+        sum=sum+ c-> getLength() ;
+    }
+    double avgLength=sum/history.size();
+    const std::vector<Watchable*>& content= s.getContent();
+    for(Watchable* show: content){
+        if (show->getLength()==avgLength){
+            bool watched=false;
+            for(Watchable* seen: history){
+                if (seen==show)
+                    watched= true;
+            }
+            if(!watched)
+                return show;
+        }
+    }
+    return nullptr;
+User* User::clone() {}
 
 }
 User* LengthRecommenderUser::clone() {
     User* newUser=new LengthRecommenderUser(getName());
     return newUser;
 }
-
-
 
 //RerunRecommenderUser
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name):User(name), indexOfHistory(0){}
@@ -48,9 +68,6 @@ User* RerunRecommenderUser::clone() {
     User* newUser=new RerunRecommenderUser(getName(),indexOfHistory);
     return newUser;
 }
-
-
-
 
 //GenreRecommenderUser
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}

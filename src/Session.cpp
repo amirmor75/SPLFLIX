@@ -144,7 +144,30 @@ Session::~Session() {
     delete activeUser;
 }
 
+
+const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
+const User& Session::getActiveUser() { return  *activeUser;}
+const std::vector<Watchable*>& Session::getContent() { return  content;}
+User* Session::getUserFromMap(std::string name) {
+    return  userMap.at(name);
+
+}
+
+
+void Session::addToActionsLog(BaseAction* newAction) {
+    this->actionsLog.push_back(newAction);
+}
+void Session::setActiveUser(User* user) {
+    this->activeUser=user;
+}
+void Session::addToUserMap(std::string name, User* newUserMap) {
+    this->userMap.insert({name,newUserMap});
+}
+std::string& Session::getCurrentCommand() { return currentCommand;}
+void Session::setCurrentCommand(std::string& currentCommand) {this->currentCommand=currentCommand;}
+
 void Session::start() {} //should be implemnted sometime
+
 
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog; }
 const User& Session::getActiveUser() { return  *activeUser; }

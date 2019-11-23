@@ -3,6 +3,8 @@
 using namespace std;
 
 int main(int argc, char** argv){
+
+
 //	if(argc!=2)
 //	{
 //		cout << "usage splflix input_file" << endl;
@@ -14,4 +16,6 @@ int main(int argc, char** argv){
     std:string str="/home/tal/CLionProjects/SPLFLIX/src/config1.json";
     Session s(str);
 	return 0;
+
+
 }

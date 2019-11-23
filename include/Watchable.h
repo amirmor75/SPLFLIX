@@ -13,10 +13,10 @@ public:
     Watchable(long id, int length, const std::vector<std::string>  tags);
     virtual ~Watchable();
     virtual std::string toString() const = 0;
-    virtual Watchable* getNextWatchable(Session&) const = 0;
+    virtual Watchable* getNextWatchable(Session&) const = 0
     virtual Watchable* clone()=0;
     const long & getId() const;
-    const int getLength() const;
+    int getLength();
     const std::vector<std::string> & getTags() const;
     virtual void recommendMe(User&  u)=0;
 private:
