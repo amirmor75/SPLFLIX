@@ -24,6 +24,7 @@ public:
     const User& getActiveUser();
     void addToActionsLog(BaseAction* newAction);
     void addToUserMap(std::string name,User* newUserMap);
+    bool deleteFromUserMap(std::string name);
     void setActiveUser(User* user);
     std::string& getCurrentCommand();
     void setCurrentCommand(std::string& currentCommand);  
