@@ -13,10 +13,8 @@ User::User(const std::string &name): name(name)
 {}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
-
-
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
-
+User* User::clone() {}
 Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
     for (int i = 0; i < history.size(); ++i) {
 
@@ -40,8 +38,6 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
         }
     }
     return nullptr;
-User* User::clone() {}
-
 }
 User* LengthRecommenderUser::clone() {
     User* newUser=new LengthRecommenderUser(getName());
