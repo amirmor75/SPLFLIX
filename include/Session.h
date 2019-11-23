@@ -12,8 +12,11 @@ class Watchable;
 class Session{
 public:
     Session(const std::string &configFilePath);
-    Session(const Session& session);
+    Session(const Session& other);
+    Session(Session&& other);
     ~Session();
+    Session& operator=(Session& other);
+    Session& operator=(Session&& other);
     void start();
     const std::vector<Watchable*>& getContent();
     const std::vector<BaseAction*>& getActionsLog();
@@ -23,13 +26,17 @@ public:
     void addToUserMap(std::string name,User* newUserMap);
     void setActiveUser(User* user);
     std::string& getCurrentCommand();
-    void setCurrentCommand(std::string& currentCommand);
+    void setCurrentCommand(std::string& currentCommand);  
+    const int getIndexOfContent();    
+
 
 private:
     std::vector<Watchable*> content;
     std::vector<BaseAction*> actionsLog;
     std::unordered_map<std::string,User*> userMap;
     User* activeUser;
-    std::string currentCommand;
+    std::string currentCommand;//the command just written in the main
+    int indexOfContent;
+
 };
 #endif
