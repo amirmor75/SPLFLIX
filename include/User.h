@@ -19,7 +19,7 @@ public:
     virtual Watchable* getRecommendation(Episode& s) = 0;
     std::string getName() const;
     std::vector<Watchable*> get_history() const;
-    virtual User* clone();
+    virtual User* clone()=0;
 protected:
     std::vector<Watchable*> history;
 private:
