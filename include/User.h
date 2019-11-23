@@ -59,7 +59,7 @@ public:
     virtual Watchable* getRecommendation(Watchable& w);
     virtual Watchable* getRecommendation(Movie& s); //we need to implement double dispatch
     virtual Watchable* getRecommendation(Episode& s);
-    User* clone();
+    User* clone()=0;
     std::string mostPopTag();
 private:
 };
