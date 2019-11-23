@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 class Session;
 
@@ -20,6 +21,7 @@ public:
 	virtual std::string toString() const=0;
 	std::string getErrorMsgPublic() const;
 	virtual BaseAction* clone()=0;
+    std::vector<std::string>& split(std::string command);
 
 protected:
 	void complete();
@@ -55,7 +57,8 @@ public:
 
 class DuplicateUser : public BaseAction {
 public:
-	virtual void act(Session & sess);
+    DuplicateUser(std::string errorMsg,ActionStatus status);
+    virtual void act(Session & sess);
 	virtual std::string toString() const;
     virtual BaseAction* clone();
 };

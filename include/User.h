@@ -15,6 +15,7 @@ class Session;
 class User{
 public:
     User(const std::string &name);
+    User(const std::string &name,std::vector<Watchable*> history)
     virtual Watchable* getRecommendation(Session& s) = 0;
     virtual Watchable* getRecommendation(Watchable& w)=0;
     virtual Watchable* getRecommendation(Movie& s) = 0;

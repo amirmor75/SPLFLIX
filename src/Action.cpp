@@ -21,6 +21,27 @@ void BaseAction::error(const std::string &errorMsg) {
     this->errorMsg="ERROR <"+errorMsg+">";
 }
 std::string BaseAction::getErrorMsg() const { return errorMsg;}
+std::vector<std::string>& BaseAction::split(std::string command) {
+    std::vector<std::string> words;
+    int index=0;
+    std::string word="";
+    for(auto& letter: command){
+        if(letter!=' ')
+        {
+            if(words.size()<index) {
+                words.push_back(word);
+                word="";
+            }
+            word=word +letter;
+        }
+        else{
+            index++;
+        }
+    }
+    words.push_back(word);
+    return words;
+}
+
 
 //+++ CreateUser +++
 void CreateUser::act(Session &sess) {
@@ -53,13 +74,15 @@ void ChangeActiveUser::act(Session &sess) {
 //+++ DeleteUser +++
 DeleteUser::DeleteUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DeleteUser::act(Session &sess) {
-    std::string& name= sess.getCurrentCommand();
-    if(sess.deleteFromUserMap(name)){
-        complete();
-    }
-    else{
-        error(name+" is not an exist user");
-    }
+    if(split(sess.getCurrentCommand()).size()==2) {
+        std::string &name = split(sess.getCurrentCommand()).at(1);
+        if (sess.deleteFromUserMap(name)) {
+            complete();
+        } else {
+            error(name + " is not an exist user");
+        }
+    } else
+        error("invalid input");
 }
 std::string DeleteUser::toString() const { return "Delete User. status:"+getStatus(); }
 BaseAction* DeleteUser::clone() {
@@ -67,4 +90,27 @@ BaseAction* DeleteUser::clone() {
     return del;
 }
 
+//+++ DuplicateUser +++
+DuplicateUser::DuplicateUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
+void DuplicateUser::act(Session &sess) {
+    if(split(sess.getCurrentCommand()).size()==3) {
+        std::string &name = split(sess.getCurrentCommand()).at(1);
+        std::string &newName = split(sess.getCurrentCommand()).at(2);
+        User* u=sess.getUserFromMap(name);
+        if (u!= nullptr) {
+            User* user;//new User(newName);
+            //...
+            sess.addToUserMap(newName,user);
+            complete();
+        } else {
+            error(name + " is not an exist user");
+        }
+    } else
+        error("invalid input");
+}
+std::string DuplicateUser::toString() const { return "Duplicate User. status:"+getStatus(); }
+BaseAction* DuplicateUser::clone() {
+    BaseAction* del=new DuplicateUser(getErrorMsg(),getStatus());
+    return del;
+}
 

@@ -8,7 +8,7 @@
 #include "Watchable.h"
 #include "Session.h"
 
-
+//+++ User +++
 User::User(const std::string &name): name(name){}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
