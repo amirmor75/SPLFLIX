@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "User.h"
 
 
 class Session;
@@ -17,6 +18,7 @@ public:
     const long & getId() const;
     const int getLength() const;
     const std::vector<std::string> & getTags() const;
+    virtual void recommendMe(User&  u)=0;
 private:
     const long id;
     int length;
@@ -28,6 +30,7 @@ public:
     Movie(long id, const std::string& name, int length, const std::vector<std::string>& tags);
     virtual std::string toString(bool print_full=false) const;
     virtual Watchable* getNextWatchable(Session&) const;
+    virtual void recommendMe(User&  u);
 private:
     std::string name;
 };
@@ -38,6 +41,7 @@ public:
     Episode(long id, const std::string& seriesName,int length, int season, int episode ,const std::vector<std::string>& tags);
     virtual std::string toString(bool print_full=false) const;
     virtual Watchable* getNextWatchable(Session&) const;
+    virtual void recommendMe(User&  u);
 private:
     std::string seriesName;
     int season;

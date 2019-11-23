@@ -144,6 +144,8 @@ Session::~Session() {
     delete activeUser;
 }
 
+void Session::start() {} //should be implemnted sometime
+
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog; }
 const User& Session::getActiveUser() { return  *activeUser; }
 const std::vector<Watchable*>& Session::getContent() { return  content; }

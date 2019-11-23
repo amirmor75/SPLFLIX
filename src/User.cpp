@@ -32,8 +32,15 @@ User* LengthRecommenderUser::clone() {
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name):User(name), indexOfHistory(0){}
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name, int index): User(name), indexOfHistory(index){}
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) {
-    //if(s.getContent().at((s.getIndexOfContent()+1)%s.getContent().size()) instanceof Movie)
-        //do something
+    s.getContent().at((s.getIndexOfContent()+1)%s.getContent().size())->recommendMe(*this);
+}
+Watchable* RerunRecommenderUser::getRecommendation(Movie &s) {
+    indexOfHistory++;
+    return history.at((indexOfHistory-1)%history.size());
+}
+Watchable* RerunRecommenderUser::getRecommendation(Episode &s) {
+    //if next episode exists then recommend it
+    //else
     indexOfHistory++;
     return history.at((indexOfHistory-1)%history.size());
 }

@@ -21,6 +21,9 @@ std::string Movie::toString(bool print_full) const {
     return getId()+". "+name+" "+std::to_string(getLength())+" minutes"+ str;
 }
 Watchable* Movie::getNextWatchable(Session &) const {}
+void Movie::recommendMe(User &u) {
+    u.getRecommendation(*this);
+}
 
 
 
@@ -32,9 +35,11 @@ std::string Episode::toString(bool print_full) const {
     return getId()+". "+seriesName+" S"+std::to_string(season)+"E"+std::to_string(episode)+
          +" "+std::to_string(getLength())+" minutes"+ str;
 }
-
 Watchable* Episode::getNextWatchable(Session & s) const
 {
+}
+void Episode::recommendMe(User &u) {
+    u.getRecommendation(*this);
 }
 
 

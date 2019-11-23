@@ -30,7 +30,7 @@ class LengthRecommenderUser : public User {
 public:
     LengthRecommenderUser(const std::string& name);
     virtual Watchable* getRecommendation(Session& s);
-    virtual Watchable* getRecommendation(Movie& s); //we need to implement double dispatch
+    virtual Watchable* getRecommendation(Movie& s); //for double dispatch
     virtual Watchable* getRecommendation(Episode& s);
     User* clone();
 private:
@@ -41,7 +41,7 @@ public:
     RerunRecommenderUser(const std::string& name);
     RerunRecommenderUser(const std::string& name, int index);
     virtual Watchable* getRecommendation(Session& s);
-    virtual Watchable* getRecommendation(Movie& s); //we need to implement double dispatch
+    virtual Watchable* getRecommendation(Movie& s); //for double dispatch
     virtual Watchable* getRecommendation(Episode& s);
     User* clone();
 private:
