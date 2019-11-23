@@ -26,6 +26,8 @@ User* LengthRecommenderUser::clone() {
     return newUser;
 }
 
+
+
 //RerunRecommenderUser
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name):User(name), indexOfHistory(0){}
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name, int index): User(name), indexOfHistory(index){}
@@ -40,10 +42,22 @@ User* RerunRecommenderUser::clone() {
     return newUser;
 }
 
+
+
+
 //GenreRecommenderUser
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}
-GenreRecommenderUser::GenreRecommenderUser(const std::string &name, const std::unordered_map<std::string, int> tags):User(name),amountOfTags(tags) {}
 std::string GenreRecommenderUser::mostPopTag() {
+    std::unordered_map<std::string,int> amountOfTags;
+    for(auto& watch: history){
+        for(auto& tag: watch->getTags()){
+            if(amountOfTags.find(tag)==amountOfTags.end())//this tag not exists
+                amountOfTags[tag]=1;
+            else
+                amountOfTags[tag]++;
+        }
+    }
+
     std::string popTag="";
     int amount=0;
     for(auto& tag: amountOfTags)
@@ -54,11 +68,9 @@ std::string GenreRecommenderUser::mostPopTag() {
         }
         else if(amount==tag.second){
             char array1[popTag.size()];
-            // copying the contents of the string to char array
-            std::strcpy(array1, popTag.c_str());
+            std::strcpy(array1, popTag.c_str()); // copying the contents of the string to char array
             char array2[tag.first.size()];
-            // copying the contents of the string to char array
-            std::strcpy(array2, tag.first.c_str());
+            std::strcpy(array2, tag.first.c_str()); // copying the contents of the string to char array
             if(std::lexicographical_compare(array2,array2+ sizeof(array2),array1,array1+sizeof(array1))) {
                 amount = tag.second;
                 popTag = tag.first;
@@ -68,15 +80,13 @@ std::string GenreRecommenderUser::mostPopTag() {
     return popTag;
 }
 Watchable* GenreRecommenderUser::getRecommendation(Session &s) {
-    //i have know idea how to check if the last content was a movie or an episode
     std::string popTag=mostPopTag();
-    std::vector<Watchable*> contents=s.getContent();
-    for(auto& content: contents){
+    for(auto& content: s.getContent()){
         //if this content content this tag and this content doesnt exists
         //in the history->return this content
     }
 }
 User* GenreRecommenderUser::clone() {
-    User* newUser=new GenreRecommenderUser(getName(),amountOfTags);
+    User* newUser=new GenreRecommenderUser(getName());
     return newUser;
 }
