@@ -9,12 +9,13 @@
 #include "Session.h"
 
 
-User::User(const std::string &name): name(name)
-{}
+User::User(const std::string &name): name(name){}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
-LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
 User* User::clone() {}
+
+//+++ LengthRecommenderUser +++
+LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
 Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
     for (int i = 0; i < history.size(); ++i) {
 
@@ -39,16 +40,22 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
     }
     return nullptr;
 }
+Watchable* LengthRecommenderUser::getRecommendation(Watchable &w) {}
+Watchable* LengthRecommenderUser::getRecommendation(Movie &s) {}
+Watchable* LengthRecommenderUser::getRecommendation(Episode &s) {}
 User* LengthRecommenderUser::clone() {
     User* newUser=new LengthRecommenderUser(getName());
     return newUser;
 }
 
-//RerunRecommenderUser
+//+++ RerunRecommenderUser +++
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name):User(name), indexOfHistory(0){}
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name, int index): User(name), indexOfHistory(index){}
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) {
     s.getContent().at((s.getIndexOfContent()+1)%s.getContent().size())->recommendMe(*this);
+}
+Watchable* RerunRecommenderUser::getRecommendation(Watchable &w) {
+
 }
 Watchable* RerunRecommenderUser::getRecommendation(Movie &s) {
     indexOfHistory++;
@@ -106,6 +113,9 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) {
         //in the history->return this content
     }
 }
+Watchable* GenreRecommenderUser::getRecommendation(Watchable &w) {}
+Watchable* GenreRecommenderUser::getRecommendation(Movie &s) {}
+Watchable* GenreRecommenderUser::getRecommendation(Episode &s) {}
 User* GenreRecommenderUser::clone() {
     User* newUser=new GenreRecommenderUser(getName());
     return newUser;

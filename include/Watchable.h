@@ -7,14 +7,15 @@
 
 
 class Session;
+class User;
 
 class Watchable{
 public:
     Watchable(long id, int length, const std::vector<std::string>&  tags);
     virtual ~Watchable();
     virtual std::string toString() const = 0;
-    virtual Watchable* getNextWatchable(Session&) const = 0
-    const long & getId() const;
+    virtual Watchable* getNextWatchable(Session&) const = 0;
+    const long &getId() const;
     int getLength() const;
     virtual Watchable* clone()=0; //need to implement in sub classes
     const std::vector<std::string> & getTags() const;

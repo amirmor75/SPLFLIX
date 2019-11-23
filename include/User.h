@@ -8,6 +8,8 @@
 #include "Watchable.h"
 
 class Watchable;
+class Movie;
+class Episode;
 class Session;
 
 class User{
@@ -32,7 +34,7 @@ public:
     LengthRecommenderUser(const std::string& name);
     virtual Watchable* getRecommendation(Session& s);
     virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s); //for double dispatch
+    virtual Watchable* getRecommendation(Movie& s);
     virtual Watchable* getRecommendation(Episode& s);
     User* clone();
 private:
@@ -44,7 +46,7 @@ public:
     RerunRecommenderUser(const std::string& name, int index);
     virtual Watchable* getRecommendation(Session& s);
     virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s); //for double dispatch
+    virtual Watchable* getRecommendation(Movie& s);
     virtual Watchable* getRecommendation(Episode& s);
     User* clone();
 private:
@@ -54,12 +56,11 @@ private:
 class GenreRecommenderUser : public User {
 public:
     GenreRecommenderUser(const std::string& name);
-    GenreRecommenderUser(const std::string& name, std::unordered_map<std::string,int> tags);
     virtual Watchable* getRecommendation(Session& s);
     virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s); //we need to implement double dispatch
+    virtual Watchable* getRecommendation(Movie& s);
     virtual Watchable* getRecommendation(Episode& s);
-    User* clone()=0;
+    User* clone();
     std::string mostPopTag();
 private:
 };
