@@ -19,6 +19,7 @@ public:
     int getLength();
     const std::vector<std::string> & getTags() const;
     virtual void recommendMe(User&  u)=0;
+    virtual Watchable* clone()=0;
 private:
     const long id;
     int length;

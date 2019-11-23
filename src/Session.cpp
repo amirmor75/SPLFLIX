@@ -168,30 +168,3 @@ void Session::setCurrentCommand(std::string& currentCommand) {this->currentComma
 
 void Session::start() {} //should be implemnted sometime
 
-
-const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog; }
-const User& Session::getActiveUser() { return  *activeUser; }
-const std::vector<Watchable*>& Session::getContent() { return  content; }
-const std::unordered_map<std::string,User*>& Session::getUserMap() { return userMap; }
-const int Session::getIndexOfContent() { return indexOfContent; }
-void Session::setActionsLog(std::vector<BaseAction *>& newActionLog) {
-    for(auto& base: actionsLog){
-        delete base;
-    }
-    actionsLog.clear();
-    actionsLog=newActionLog;
-}
-void Session::setActiveUser(User* newUser) {
-    if(newUser!=nullptr) {
-        delete activeUser;
-        activeUser = newUser;
-    }
-}
-void Session::setUserMap(std::unordered_map<std::string, User *>& newUserMap) {
-    for(auto& x: userMap){
-        delete x.second;
-    }
-    userMap.clear();
-    userMap=newUserMap;
-}
-
