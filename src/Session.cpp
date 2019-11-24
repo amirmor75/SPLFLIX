@@ -36,6 +36,8 @@ Session::Session(const std::string &configFilePath):indexOfContent(0) {
     }
 }
 
+
+//5 Rule S
 //Session copy constructor
 Session::Session(const Session &other){
     indexOfContent=other.indexOfContent;
@@ -143,7 +145,7 @@ Session::~Session() {
     }
     delete activeUser;
 }
-
+//5 Rule F
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
 const User& Session::getActiveUser() { return  *activeUser;}
 const std::vector<Watchable*>& Session::getContent() { return  content;}

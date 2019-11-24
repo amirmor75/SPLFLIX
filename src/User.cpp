@@ -15,6 +15,20 @@ std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
 User* User::clone() {}
+
+User::~User() {
+    for (Watchable* w:history) {
+        delete w;
+    }
+}
+User::User(const User &other): name(other.name) {
+    for (int i = 0; i <history.size(); ++i)
+        this->history[i]=other.history[i]->clone();
+}
+
+
+
+
 Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
     for (int i = 0; i < history.size(); ++i) {
 

@@ -13,7 +13,7 @@ const long & Watchable::getId() const { return id; }
 int Watchable::getLength() const{ return length; }
 const std::vector<std::string> & Watchable::getTags() const{ return tags; }
 
-//Movie
+//Movie S
 Movie::Movie(long id, const std::string &name, int length, const std::vector<std::string> &tags):Watchable(id,length,tags), name(name) {}
 
 std::string Movie::toString(bool print_full) const {
@@ -24,10 +24,14 @@ Watchable* Movie::getNextWatchable(Session &) const {}
 void Movie::recommendMe(User &u) {
     u.getRecommendation(*this);
 }
+Movie::Movie(Movie &other):Watchable(other.getId(),other.getLength(),other.getTags()) {
+    this->name=other.name;
+}
+std::string Movie::getName() { return name;}
+//Movie F
 
 
-
-//Episode
+//Episode S
 Episode::Episode(long id, const std::string &seriesName, int length, int season, int episode,const std::vector<std::string> &tags):Watchable(id,length,tags),season(season),episode(episode),seriesName(seriesName)
 {}
 std::string Episode::toString(bool print_full) const {
@@ -41,6 +45,9 @@ Watchable* Episode::getNextWatchable(Session & s) const
 void Episode::recommendMe(User &u) {
     u.getRecommendation(*this);
 }
-
+std::string Episode::getSeriesName() { return  seriesName;}
+long Episode::getNextEpisodeId() { return  nextEpisodeId;}
+int Episode::getEpisode() { return  episode;}
+//Episode F
 
 

@@ -13,6 +13,13 @@ class Session;
 class User{
 public:
     User(const std::string &name);
+    //5 Rule S
+    ~User();
+    User(const User& other);
+    User(User&& other);
+    User& operator=(User& other);
+    User& operator=(User&& other);
+    //5 Rule F
     virtual Watchable* getRecommendation(Session& s) = 0;
     virtual Watchable* getRecommendation(Watchable& w)=0;
     virtual Watchable* getRecommendation(Movie& s) = 0;
