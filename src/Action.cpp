@@ -21,15 +21,15 @@ void BaseAction::error(const std::string &errorMsg) {
     this->errorMsg="ERROR <"+errorMsg+">";
 }
 std::string BaseAction::getErrorMsg() const { return errorMsg;}
-std::vector<std::string>& BaseAction::split(std::string command) {
-    std::vector<std::string> words;
+std::vector<std::string>* BaseAction::split(std::string command) {
+    std::vector<std::string>* words=new std::vector<std::string>();
     int index=0;
     std::string word="";
     for(auto& letter: command){
         if(letter!=' ')
         {
-            if(words.size()<index) {
-                words.push_back(word);
+            if(words->size()<index) {
+                words->push_back(word);
                 word="";
             }
             word=word +letter;
@@ -38,44 +38,74 @@ std::vector<std::string>& BaseAction::split(std::string command) {
             index++;
         }
     }
-    words.push_back(word);
+    words->push_back(word);
     return words;
 }
 
 
 //+++ CreateUser +++
 void CreateUser::act(Session &sess) {
-    // check if got a valid string if not make this error.
-    // check valid command
-
-    std::string& command=sess.getCurrentCommand();// assumption: gets only name and type of algo
-    std::string name = command.substr(0,command.find(" "));
-    User* user;
-    if (command.substr(command.size()-4)=="gen") {
-        user = new GenreRecommenderUser(name);
-    }
-    if (command.substr(command.size()-4)=="len") {
-        user = new LengthRecommenderUser(name);
-    }
-    if (command.substr(command.size()-4)=="rer") {
-        user = new RerunRecommenderUser(name);
-    }
-    sess.addToUserMap(name,user);
+    if(split(sess.getCurrentCommand())->size()==2) {
+        std::string& command=sess.getCurrentCommand();
+        std::string& name =  split(command)->at(0);
+        std::string& algorithm=split(command)->at(1);
+        User *user;
+        if(sess.getUserFromMap(name)== nullptr) {
+            if (command.compare("gen") == 0) {
+                user = new GenreRecommenderUser(name);
+                sess.addToUserMap(name, user);
+                complete();
+            } else if (command.compare("len") == 0) {
+                user = new LengthRecommenderUser(name);
+                sess.addToUserMap(name, user);
+                complete();
+            } else if (command.compare("rer") == 0) {
+                user = new RerunRecommenderUser(name);
+                sess.addToUserMap(name, user);
+                complete();
+            }
+            else{
+                error("invalid recommendation algorithm");
+            }
+        } else {
+            error("This name is already exists");
+        }
+    } else
+        error("invalid input");
+}
+std::string CreateUser::toString() const { return "CreateUser"; }
+BaseAction* CreateUser::clone() {
+    BaseAction* del=new CreateUser(getErrorMsg(),getStatus());
+    return del;
 }
 
 //+++ ChangeActiveUser +++
 void ChangeActiveUser::act(Session &sess) {
-    // check valid name and not space in beginning
-    std::string& name= sess.getCurrentCommand();
-    User* user=sess.getUserFromMap(name);
-    sess.setActiveUser(user);
+    if(split(sess.getCurrentCommand())->size()==1) {
+        std::string& command=sess.getCurrentCommand();
+        std::string& name =  split(command)->at(0);
+        User *user = sess.getUserFromMap(name);
+        if(user!=nullptr){
+            sess.setActiveUser(user);
+            complete();
+        }
+        else
+            error("user "+name+" has never been created");
+    }
+    else
+        error("invalid input");
+}
+std::string ChangeActiveUser::toString() const { return "ChangeActiveUser"; }
+BaseAction* ChangeActiveUser::clone() {
+    BaseAction* del=new ChangeActiveUser(getErrorMsg(),getStatus());
+    return del;
 }
 
 //+++ DeleteUser +++
 DeleteUser::DeleteUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DeleteUser::act(Session &sess) {
-    if(split(sess.getCurrentCommand()).size()==1) {
-        std::string &name = split(sess.getCurrentCommand()).at(0);
+    if(split(sess.getCurrentCommand())->size()==1) {
+        std::string &name = split(sess.getCurrentCommand())->at(0);
         if (sess.deleteFromUserMap(name)) {
             complete();
         } else {
@@ -84,7 +114,7 @@ void DeleteUser::act(Session &sess) {
     } else
         error("invalid input");
 }
-std::string DeleteUser::toString() const { return "Delete User. status:"+getStatus(); }
+std::string DeleteUser::toString() const { return "Delete User"; }
 BaseAction* DeleteUser::clone() {
     BaseAction* del=new DeleteUser(getErrorMsg(),getStatus());
     return del;
@@ -93,21 +123,27 @@ BaseAction* DeleteUser::clone() {
 //+++ DuplicateUser +++
 DuplicateUser::DuplicateUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DuplicateUser::act(Session &sess) {
-    if(split(sess.getCurrentCommand()).size()==2) {
-        std::string &name = split(sess.getCurrentCommand()).at(0);
-        std::string &newName = split(sess.getCurrentCommand()).at(1);
-        User* u=sess.getUserFromMap(name);
-        if (u!= nullptr) {
-            User* user=u->duplicateUser(newName);
-            sess.addToUserMap(newName,user);
-            complete();
-        } else {
-            error(name + " is not an exist user");
+    std::string command=sess.getCurrentCommand();
+    if(split(command)->size()==2) {
+        std::string &name = split(command)->at(0);
+        std::string &newName = split(command)->at(1);
+        User* user=sess.getUserFromMap(name);
+        User* newUser=sess.getUserFromMap(newName);
+        if(newUser== nullptr) {
+            if (user != nullptr) {
+                User *user = user->duplicateUser(newName);
+                sess.addToUserMap(newName, user);
+                complete();
+            } else {
+                error(name + " is not an exist user");
+            }
+        } else{
+            error(newName + " is an exist user");
         }
     } else
         error("invalid input");
 }
-std::string DuplicateUser::toString() const { return "Duplicate User. status:"+getStatus(); }
+std::string DuplicateUser::toString() const { return "DuplicateUser"; }
 BaseAction* DuplicateUser::clone() {
     BaseAction* del=new DuplicateUser(getErrorMsg(),getStatus());
     return del;
@@ -128,7 +164,7 @@ void PrintContentList::act(Session &sess) {
     }
     complete();
 }
-std::string PrintContentList::toString() const { return "PrintContentList. status:"+getStatus(); }
+std::string PrintContentList::toString() const { return "PrintContentList"; }
 BaseAction* PrintContentList::clone() {
     BaseAction* del=new PrintContentList(getErrorMsg(),getStatus());
     return del;
@@ -148,7 +184,7 @@ void PrintWatchHistory::act(Session &sess) {
     }
     complete();
 }
-std::string PrintWatchHistory::toString() const { return "PrintWatchHistory. status:"+getStatus(); }
+std::string PrintWatchHistory::toString() const { return "PrintWatchHistory"; }
 BaseAction* PrintWatchHistory::clone() {
     BaseAction* del=new PrintWatchHistory(getErrorMsg(),getStatus());
     return del;
@@ -158,8 +194,8 @@ BaseAction* PrintWatchHistory::clone() {
 //+++ Watch +++
 Watch::Watch(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void Watch::act(Session &sess) {
-    if(split(sess.getCurrentCommand()).size()==1) {
-        std::string &idStr = split(sess.getCurrentCommand()).at(0);
+    if(split(sess.getCurrentCommand())->size()==1) {
+        std::string &idStr = split(sess.getCurrentCommand())->at(0);
         Watchable* watch=sess.getContentByID(stoi(idStr));
         if (watch!= nullptr) {
             std::string name="Watching "+watch->toString();
@@ -176,12 +212,12 @@ void Watch::act(Session &sess) {
             }
             complete();
         } else {
-            error(idStr + " is out of content bound");
+            error(idStr + " is out of content bounds");
         }
     } else
         error("invalid input");
 }
-std::string Watch::toString() const { return "Watch. status:"+getStatus(); }
+std::string Watch::toString() const { return "Watch"; }
 BaseAction* Watch::clone() {
     BaseAction* del=new Watch(getErrorMsg(),getStatus());
     return del;
@@ -212,7 +248,7 @@ BaseAction* PrintActionsLog::clone() {
 //+++ Exit +++
 Exit::Exit(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void Exit::act(Session &sess) {
-    break;
+    //break;
     complete();
 }
 std::string Exit::toString() const { return "Exit"; }

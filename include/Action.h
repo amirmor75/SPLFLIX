@@ -11,7 +11,6 @@ enum ActionStatus{
 	PENDING, COMPLETED, ERROR
 };
 
-
 class BaseAction{
 public:
 	BaseAction();
@@ -21,7 +20,7 @@ public:
 	virtual std::string toString() const=0;
 	std::string getErrorMsgPublic() const;
 	virtual BaseAction* clone()=0;
-    std::vector<std::string>& split(std::string command);
+    std::vector<std::string>* split(std::string command);
 
 protected:
 	void complete();
@@ -34,14 +33,16 @@ private:
 
 class CreateUser  : public BaseAction {
 public:
-	virtual void act(Session& sess);
+    CreateUser(std::string errorMsg,ActionStatus status);
+    virtual void act(Session& sess);
 	virtual std::string toString() const;
     virtual BaseAction* clone();
 };
 
 class ChangeActiveUser : public BaseAction {
 public:
-	virtual void act(Session& sess);
+    ChangeActiveUser(std::string errorMsg,ActionStatus status);
+    virtual void act(Session& sess);
 	virtual std::string toString() const;
     virtual BaseAction* clone();
 };
