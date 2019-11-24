@@ -19,9 +19,10 @@ public:
     Session& operator=(Session&& other);
     void start();
     const std::vector<Watchable*>& getContent();
+    Watchable* getContentByID(long id) const;
     const std::vector<BaseAction*>& getActionsLog();
     User* getUserFromMap(std::string name);
-    const User& getActiveUser();
+    User& getActiveUser() const;
     void addToActionsLog(BaseAction* newAction);
     void addToUserMap(std::string name,User* newUserMap);
     bool deleteFromUserMap(std::string name);
