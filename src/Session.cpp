@@ -9,7 +9,7 @@
 #include <User.h>
 
 //Session Constructor
-Session::Session(const std::string &configFilePath):indexOfContent(0) {
+Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand("") {
     //activeUser=new User();
     using json= nlohmann::json;
     std::ifstream file(configFilePath);
@@ -38,21 +38,22 @@ Session::Session(const std::string &configFilePath):indexOfContent(0) {
 
 //Session copy constructor
 Session::Session(const Session &other){
+    currentCommand=other.currentCommand;
     indexOfContent=other.indexOfContent;
     activeUser=other.activeUser->clone(); //need to implement clone func
     for(int i=0;i<other.content.size();i++){
-        content.push_back(other.content.at(i));
+        content.push_back(other.content.at(i)->clone());
     }
     for(int i=0;i<other.actionsLog.size();i++){
-        actionsLog.push_back(other.actionsLog.at(i));
+        actionsLog.push_back(other.actionsLog.at(i)->clone());
     }
     for (auto& x: other.userMap) {
-        userMap.insert(x);
+        userMap.insert({x.first,x.second->clone()});
     }
 }
 
 Session::Session(Session&& other):
-activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), indexOfContent(other.indexOfContent) {
+activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), indexOfContent(other.indexOfContent), currentCommand(other.currentCommand) {
     other.activeUser= nullptr;
     for(int i=0;i<other.content.size();i++){
         other.content.at(i)= nullptr;
@@ -67,6 +68,7 @@ activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog
 
 Session& Session::operator=(Session& other) {
     if(this != &other){
+        currentCommand=other.currentCommand;
         indexOfContent=other.indexOfContent;
         delete activeUser;
         activeUser=other.activeUser->clone();
@@ -91,7 +93,7 @@ Session& Session::operator=(Session& other) {
         }
         userMap.clear();
         for (auto& x: other.userMap) {
-            userMap.insert(x);
+            userMap.insert({x.first,x.second->clone()});
         }
     }
     return (*this);
@@ -99,34 +101,25 @@ Session& Session::operator=(Session& other) {
 
 Session& Session::operator=(Session &&other) {
     if(this!=&other){
+        currentCommand=other.currentCommand;
         indexOfContent=other.indexOfContent;
         delete activeUser;
         activeUser=other.activeUser;
-        delete other.activeUser;
 
         for(int i=0;i<content.size();i++){
             delete content.at(i);
         }
         content=other.content; //shallow copy
-        for(int i=0;i<other.content.size();i++){
-            delete other.content.at(i);
-        }
 
         for(int i=0;i<actionsLog.size();i++){
             delete actionsLog.at(i);
         }
         actionsLog=other.actionsLog; //shallow copy
-        for(int i=0;i<other.actionsLog.size();i++){
-            delete other.actionsLog.at(i);
-        }
 
         for (auto& x: userMap) {
             delete x.second;
         }
         userMap=other.userMap; //shallow copy
-        for (auto& x: other.userMap) {
-            delete x.second;
-        }
     }
     return (*this);
 }
@@ -171,7 +164,7 @@ std::string& Session::getCurrentCommand() { return currentCommand;}
 void Session::setCurrentCommand(std::string& currentCommand) {this->currentCommand=currentCommand;}
 
 
-void Session::start() {} //should be implemnted sometime
+void Session::start() {} //should be implemented sometime
 
 
 bool Session::deleteFromUserMap(std::string name) {

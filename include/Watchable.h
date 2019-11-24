@@ -31,10 +31,11 @@ private:
 class Movie : public Watchable{
 public:
     Movie(long id, const std::string& name, int length, const std::vector<std::string>& tags);
-    virtual std::string toString(bool print_full=false) const;
-    virtual std::string printAll();
+    std::string toString(bool print_full=false) const;
+    std::string printAll();
     virtual Watchable* getNextWatchable(Session&) const;
     virtual void recommendMe(User&  u);
+    Watchable* clone(); //need to implement
 private:
     std::string name;
 };
@@ -43,10 +44,11 @@ private:
 class Episode: public Watchable{
 public:
     Episode(long id, const std::string& seriesName,int length, int season, int episode ,const std::vector<std::string>& tags);
-    virtual std::string toString(bool print_full=false) const;
-    virtual std::string printAll();
+    std::string toString(bool print_full=false) const;
+    std::string printAll();
     virtual Watchable* getNextWatchable(Session&) const;
     virtual void recommendMe(User&  u);
+    Watchable* clone();//need to implement
 private:
     std::string seriesName;
     int season;
