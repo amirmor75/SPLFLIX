@@ -34,10 +34,10 @@ private:
 class LengthRecommenderUser : public User {
 public:
     LengthRecommenderUser(const std::string& name);
-    virtual Watchable* getRecommendation(Session& s);
-    virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s);
-    virtual Watchable* getRecommendation(Episode& s);
+    Watchable* getRecommendation(Session& s);
+    Watchable* getRecommendation(Watchable& w);
+    Watchable* getRecommendation(Movie& s);
+    Watchable* getRecommendation(Episode& s);
     User* duplicateUser(std::string &name);
     User* clone();
 private:
@@ -47,10 +47,10 @@ class RerunRecommenderUser : public User {
 public:
     RerunRecommenderUser(const std::string& name);
     RerunRecommenderUser(const std::string& name, int index);
-    virtual Watchable* getRecommendation(Session& s);
-    virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s);
-    virtual Watchable* getRecommendation(Episode& s);
+    Watchable* getRecommendation(Session& s);
+    Watchable* getRecommendation(Watchable& w);
+    Watchable* getRecommendation(Movie& s);
+    Watchable* getRecommendation(Episode& s);
     User* duplicateUser(std::string &name);
     User* clone();
 private:
@@ -60,10 +60,10 @@ private:
 class GenreRecommenderUser : public User {
 public:
     GenreRecommenderUser(const std::string& name);
-    virtual Watchable* getRecommendation(Session& s);
-    virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s);
-    virtual Watchable* getRecommendation(Episode& s);
+    Watchable* getRecommendation(Session& s);
+    Watchable* getRecommendation(Watchable& w);
+    Watchable* getRecommendation(Movie& s);
+    Watchable* getRecommendation(Episode& s);
     User* duplicateUser(std::string &name);
     User* clone();
     std::string mostPopTag();

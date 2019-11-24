@@ -145,11 +145,17 @@ Session::~Session() {
 }
 
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
-const User& Session::getActiveUser() { return  *activeUser;}
+User& Session::getActiveUser() const{ return  *activeUser;}
 const std::vector<Watchable*>& Session::getContent() { return  content;}
 User* Session::getUserFromMap(std::string name) {
     return  userMap.at(name);
-
+}
+Watchable* Session::getContentByID(long id) const{
+    for(auto& watch: content){
+        if(watch->getId()==id)
+            return watch;
+    }
+    return nullptr;
 }
 
 void Session::addToActionsLog(BaseAction* newAction) {

@@ -126,14 +126,13 @@ void PrintContentList::act(Session &sess) {
         std::cout << str << '\n';
         index++;
     }
+    complete();
 }
 std::string PrintContentList::toString() const { return "PrintContentList. status:"+getStatus(); }
 BaseAction* PrintContentList::clone() {
     BaseAction* del=new PrintContentList(getErrorMsg(),getStatus());
     return del;
 }
-
-
 
 
 //+++ PrintContentList +++
@@ -147,9 +146,77 @@ void PrintWatchHistory::act(Session &sess) {
         std::cout << str << '\n';
         index++;
     }
+    complete();
 }
-std::string PrintWatchHistory::toString() const { return "PrintContentList. status:"+getStatus(); }
+std::string PrintWatchHistory::toString() const { return "PrintWatchHistory. status:"+getStatus(); }
 BaseAction* PrintWatchHistory::clone() {
     BaseAction* del=new PrintWatchHistory(getErrorMsg(),getStatus());
+    return del;
+}
+
+
+//+++ Watch +++
+Watch::Watch(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
+void Watch::act(Session &sess) {
+    if(split(sess.getCurrentCommand()).size()==1) {
+        std::string &idStr = split(sess.getCurrentCommand()).at(0);
+        Watchable* watch=sess.getContentByID(stoi(idStr));
+        if (watch!= nullptr) {
+            std::string name="Watching "+watch->toString();
+            std::cout<<name<<'\n';
+            sess.getActiveUser().get_history().push_back(watch);
+            Watchable* nextWatch=sess.getActiveUser().getRecommendation(sess);
+            name="We recommend watching "+nextWatch->toString()+", continue watching? [y/n]";
+            char answer;
+            std::cin >> answer;
+            if(answer=='y'){
+                name=nextWatch->getId()+"";
+                sess.setCurrentCommand(name);
+                act(sess);
+            }
+            complete();
+        } else {
+            error(idStr + " is out of content bound");
+        }
+    } else
+        error("invalid input");
+}
+std::string Watch::toString() const { return "Watch. status:"+getStatus(); }
+BaseAction* Watch::clone() {
+    BaseAction* del=new Watch(getErrorMsg(),getStatus());
+    return del;
+}
+
+
+//+++ PrintActionsLog +++
+PrintActionsLog::PrintActionsLog(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
+void PrintActionsLog::act(Session &sess) {
+    std::string str,status,error;
+    for(auto& action: sess.getActionsLog()) {
+        str=action->toString()+" ";
+        status=action->getStatus();
+        if(status.compare("ERROR")==0)
+            error=" "+action->getErrorMsgPublic();
+        str+=status+error;
+        std::cout << str << '\n';
+    }
+    complete();
+}
+std::string PrintActionsLog::toString() const { return "PrintActionsLog"; }
+BaseAction* PrintActionsLog::clone() {
+    BaseAction* del=new PrintActionsLog(getErrorMsg(),getStatus());
+    return del;
+}
+
+
+//+++ Exit +++
+Exit::Exit(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
+void Exit::act(Session &sess) {
+    break;
+    complete();
+}
+std::string Exit::toString() const { return "Exit"; }
+BaseAction* Exit::clone() {
+    BaseAction* del=new Exit(getErrorMsg(),getStatus());
     return del;
 }

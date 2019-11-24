@@ -82,7 +82,8 @@ public:
 
 class Watch : public BaseAction {
 public:
-	virtual void act(Session& sess);
+    Watch(std::string errorMsg,ActionStatus status);
+    virtual void act(Session& sess);
 	virtual std::string toString() const;
     virtual BaseAction* clone();
 };
@@ -90,14 +91,16 @@ public:
 
 class PrintActionsLog : public BaseAction {
 public:
-	virtual void act(Session& sess);
+    PrintActionsLog(std::string errorMsg,ActionStatus status);
+    virtual void act(Session& sess);
 	virtual std::string toString() const;
     virtual BaseAction* clone();
 };
 
 class Exit : public BaseAction {
 public:
-	virtual void act(Session& sess);
+    Exit(std::string errorMsg,ActionStatus status);
+    virtual void act(Session& sess);
 	virtual std::string toString() const;
     virtual BaseAction* clone();
 };
