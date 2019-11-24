@@ -74,8 +74,8 @@ void ChangeActiveUser::act(Session &sess) {
 //+++ DeleteUser +++
 DeleteUser::DeleteUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DeleteUser::act(Session &sess) {
-    if(split(sess.getCurrentCommand()).size()==2) {
-        std::string &name = split(sess.getCurrentCommand()).at(1);
+    if(split(sess.getCurrentCommand()).size()==1) {
+        std::string &name = split(sess.getCurrentCommand()).at(0);
         if (sess.deleteFromUserMap(name)) {
             complete();
         } else {
@@ -93,13 +93,12 @@ BaseAction* DeleteUser::clone() {
 //+++ DuplicateUser +++
 DuplicateUser::DuplicateUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DuplicateUser::act(Session &sess) {
-    if(split(sess.getCurrentCommand()).size()==3) {
-        std::string &name = split(sess.getCurrentCommand()).at(1);
-        std::string &newName = split(sess.getCurrentCommand()).at(2);
+    if(split(sess.getCurrentCommand()).size()==2) {
+        std::string &name = split(sess.getCurrentCommand()).at(0);
+        std::string &newName = split(sess.getCurrentCommand()).at(1);
         User* u=sess.getUserFromMap(name);
         if (u!= nullptr) {
-            User* user;//new User(newName);
-            //...
+            User* user=u->duplicateUser(newName);
             sess.addToUserMap(newName,user);
             complete();
         } else {
@@ -114,3 +113,43 @@ BaseAction* DuplicateUser::clone() {
     return del;
 }
 
+
+//+++ PrintContentList +++
+PrintContentList::PrintContentList(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
+void PrintContentList::act(Session &sess) {
+    int index=1;
+    std::string str="";
+    for(auto& watch: sess.getContent()) {
+        str=index+". ";
+        str+=watch->toString()+" ";
+        str+=watch->printAll();
+        std::cout << str << '\n';
+        index++;
+    }
+}
+std::string PrintContentList::toString() const { return "PrintContentList. status:"+getStatus(); }
+BaseAction* PrintContentList::clone() {
+    BaseAction* del=new PrintContentList(getErrorMsg(),getStatus());
+    return del;
+}
+
+
+
+
+//+++ PrintContentList +++
+PrintWatchHistory::PrintWatchHistory(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
+void PrintWatchHistory::act(Session &sess) {
+    int index=1;
+    std::string str="";
+    for(auto& watch: sess.getActiveUser().get_history()) {
+        str=index+". ";
+        str+=watch->toString();
+        std::cout << str << '\n';
+        index++;
+    }
+}
+std::string PrintWatchHistory::toString() const { return "PrintContentList. status:"+getStatus(); }
+BaseAction* PrintWatchHistory::clone() {
+    BaseAction* del=new PrintWatchHistory(getErrorMsg(),getStatus());
+    return del;
+}

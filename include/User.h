@@ -22,6 +22,7 @@ public:
     virtual Watchable* getRecommendation(Episode& s) = 0;
     std::string getName() const;
     std::vector<Watchable*> get_history() const;
+    virtual User* duplicateUser(std::string &name)=0;
     virtual User* clone()=0;
 protected:
     std::vector<Watchable*> history;
@@ -37,6 +38,7 @@ public:
     virtual Watchable* getRecommendation(Watchable& w);
     virtual Watchable* getRecommendation(Movie& s);
     virtual Watchable* getRecommendation(Episode& s);
+    User* duplicateUser(std::string &name);
     User* clone();
 private:
 };
@@ -49,6 +51,7 @@ public:
     virtual Watchable* getRecommendation(Watchable& w);
     virtual Watchable* getRecommendation(Movie& s);
     virtual Watchable* getRecommendation(Episode& s);
+    User* duplicateUser(std::string &name);
     User* clone();
 private:
     int indexOfHistory;
@@ -61,6 +64,7 @@ public:
     virtual Watchable* getRecommendation(Watchable& w);
     virtual Watchable* getRecommendation(Movie& s);
     virtual Watchable* getRecommendation(Episode& s);
+    User* duplicateUser(std::string &name);
     User* clone();
     std::string mostPopTag();
 private:

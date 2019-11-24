@@ -43,6 +43,13 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
 Watchable* LengthRecommenderUser::getRecommendation(Watchable &w) {}
 Watchable* LengthRecommenderUser::getRecommendation(Movie &s) {}
 Watchable* LengthRecommenderUser::getRecommendation(Episode &s) {}
+User* LengthRecommenderUser::duplicateUser(std::string &name) {
+    User* newUser=new LengthRecommenderUser(name);
+    for(auto& watch: get_history()){
+        newUser->get_history().push_back(watch->clone());
+    }
+    return newUser;
+}
 User* LengthRecommenderUser::clone() {
     User* newUser=new LengthRecommenderUser(getName());
     return newUser;
@@ -66,6 +73,13 @@ Watchable* RerunRecommenderUser::getRecommendation(Episode &s) {
     //else
     indexOfHistory++;
     return history.at((indexOfHistory-1)%history.size());
+}
+User* RerunRecommenderUser::duplicateUser(std::string &name) {
+    User* newUser=new RerunRecommenderUser(name);
+    for(auto& watch: get_history()){
+        newUser->get_history().push_back(watch->clone());
+    }
+    return newUser;
 }
 User* RerunRecommenderUser::clone() {
     User* newUser=new RerunRecommenderUser(getName(),indexOfHistory);
@@ -116,6 +130,13 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) {
 Watchable* GenreRecommenderUser::getRecommendation(Watchable &w) {}
 Watchable* GenreRecommenderUser::getRecommendation(Movie &s) {}
 Watchable* GenreRecommenderUser::getRecommendation(Episode &s) {}
+User* GenreRecommenderUser::duplicateUser(std::string &name) {
+    User* newUser=new GenreRecommenderUser(name);
+    for(auto& watch: get_history()){
+        newUser->get_history().push_back(watch->clone());
+    }
+    return newUser;
+}
 User* GenreRecommenderUser::clone() {
     User* newUser=new GenreRecommenderUser(getName());
     return newUser;

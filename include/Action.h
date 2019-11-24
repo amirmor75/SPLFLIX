@@ -65,6 +65,7 @@ public:
 
 class PrintContentList : public BaseAction {
 public:
+    PrintContentList(std::string errorMsg,ActionStatus status);
 	virtual void act (Session& sess);
 	virtual std::string toString() const;
     virtual BaseAction* clone();
@@ -72,7 +73,8 @@ public:
 
 class PrintWatchHistory : public BaseAction {
 public:
-	virtual void act (Session& sess);
+    PrintWatchHistory(std::string errorMsg,ActionStatus status);
+    virtual void act (Session& sess);
 	virtual std::string toString() const;
     virtual BaseAction* clone();
 };
