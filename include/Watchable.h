@@ -18,7 +18,7 @@ public:
     virtual Watchable* getNextWatchable(Session&) const = 0;
     const long &getId() const;
     int getLength() const;
-    virtual Watchable* clone()=0; //need to implement in sub classes
+    virtual Watchable* clone()=0;
     const std::vector<std::string> & getTags() const;
     virtual void recommendMe(User&  u)=0;
 
@@ -31,11 +31,11 @@ private:
 class Movie : public Watchable{
 public:
     Movie(long id, const std::string& name, int length, const std::vector<std::string>& tags);
-    std::string toString(bool print_full=false) const;
-    std::string printAll();
+    virtual std::string toString() const;
+    std::string printAll() const;
     virtual Watchable* getNextWatchable(Session&) const;
     virtual void recommendMe(User&  u);
-    Watchable* clone(); //need to implement
+    Watchable* clone();
 private:
     std::string name;
 };
@@ -44,11 +44,11 @@ private:
 class Episode: public Watchable{
 public:
     Episode(long id, const std::string& seriesName,int length, int season, int episode ,const std::vector<std::string>& tags);
-    std::string toString(bool print_full=false) const;
-    std::string printAll();
+    virtual std::string toString() const;
+    std::string printAll() const;
     virtual Watchable* getNextWatchable(Session&) const;
     virtual void recommendMe(User&  u);
-    Watchable* clone();//need to implement
+    Watchable* clone();
 private:
     std::string seriesName;
     int season;

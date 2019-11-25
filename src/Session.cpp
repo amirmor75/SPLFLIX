@@ -9,7 +9,7 @@
 #include <User.h>
 
 //Session Constructor
-Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand("") {
+Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand(""), isRunning(false) {
     //activeUser=new User();
     using json= nlohmann::json;
     std::ifstream file(configFilePath);
@@ -19,7 +19,7 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
     json movies;
     movies=j["movies"];
     for (auto& element : movies){
-        //content.push_back(new Movie(content.size(),element["name"],element["length"],element["tags"]));
+        content.push_back(new Movie(content.size(),element["name"],element["length"],element["tags"]));
     }
     json series;
     series=j["tv_series"];
@@ -29,7 +29,7 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
         std::cout << element["seasons"] << '\n';
         for (auto &season: element["seasons"]) {
             for (int i = 1; i <= season; i++) {
-                //content.push_back(new Episode(content.size(), element["name"], element["episode_length"],i,seasonIndex, element["tags"]));
+                content.push_back(new Episode(content.size(), element["name"], element["episode_length"],i,seasonIndex, element["tags"]));
             }
             seasonIndex++;
         }
@@ -37,10 +37,11 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
 }
 
 //Session copy constructor
-Session::Session(const Session &other){
-    currentCommand=other.currentCommand;
-    indexOfContent=other.indexOfContent;
+Session::Session(const Session &other): isRunning(other.isRunning), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent){
     activeUser=other.activeUser->clone(); //need to implement clone func
+ //   for(std::vector<Watchable*>::const_iterator i = content.begin(); i!= content.end(); i++)
+   //     content.push_back((*i)->clone());
+
     for(int i=0;i<other.content.size();i++){
         content.push_back(other.content.at(i)->clone());
     }
@@ -53,7 +54,7 @@ Session::Session(const Session &other){
 }
 
 Session::Session(Session&& other):
-activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), indexOfContent(other.indexOfContent), currentCommand(other.currentCommand) {
+activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), indexOfContent(other.indexOfContent), currentCommand(other.currentCommand), isRunning(other.isRunning) {
     other.activeUser= nullptr;
     for(int i=0;i<other.content.size();i++){
         other.content.at(i)= nullptr;
@@ -68,6 +69,7 @@ activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog
 
 Session& Session::operator=(Session& other) {
     if(this != &other){
+        indexOfContent=other.indexOfContent;
         currentCommand=other.currentCommand;
         indexOfContent=other.indexOfContent;
         delete activeUser;
@@ -101,6 +103,7 @@ Session& Session::operator=(Session& other) {
 
 Session& Session::operator=(Session &&other) {
     if(this!=&other){
+        indexOfContent=other.indexOfContent;
         currentCommand=other.currentCommand;
         indexOfContent=other.indexOfContent;
         delete activeUser;
@@ -162,7 +165,9 @@ void Session::addToUserMap(std::string name, User* newUserMap) {
 }
 std::string& Session::getCurrentCommand() { return currentCommand;}
 void Session::setCurrentCommand(std::string& currentCommand) {this->currentCommand=currentCommand;}
-
+const int Session::getIndexOfContent() { return indexOfContent; }
+bool Session::getIsRun() const { return isRunning; }
+bool Session::setIsRun(bool run) { isRunning=run; }
 
 void Session::start() {} //should be implemented sometime
 

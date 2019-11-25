@@ -248,7 +248,7 @@ BaseAction* PrintActionsLog::clone() {
 //+++ Exit +++
 Exit::Exit(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void Exit::act(Session &sess) {
-    //break;
+    sess.setIsRun(false);
     complete();
 }
 std::string Exit::toString() const { return "Exit"; }

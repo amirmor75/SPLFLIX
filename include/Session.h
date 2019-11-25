@@ -30,7 +30,8 @@ public:
     std::string& getCurrentCommand();
     void setCurrentCommand(std::string& currentCommand);  
     const int getIndexOfContent();    
-
+    bool getIsRun() const;
+    bool setIsRun(bool run);
 
 private:
     std::vector<Watchable*> content;
@@ -38,7 +39,8 @@ private:
     std::unordered_map<std::string,User*> userMap;
     User* activeUser;
     std::string currentCommand;//the command just written in the main
-    int indexOfContent;
+    int indexOfContent;//index of the current content the activeUser just watch
+    bool isRunning;//if the main loop is still running
 
 };
 #endif
