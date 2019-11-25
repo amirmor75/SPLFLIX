@@ -201,6 +201,7 @@ void Session::start() {
     BaseAction* baseAction;
     std::cout<<"SPLFLIX is now on!"<<'\n';
     activeUser=new LengthRecommenderUser("default");
+    //addToUserMap("default",activeUser);
     setIsRun(true);
     while(getIsRun()){
         std::cin >>currentCommand;
