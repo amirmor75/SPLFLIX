@@ -15,7 +15,10 @@ int main(int argc, char** argv){
 
     std:string str="/home/tal/CLionProjects/SPLFLIX/src/config1.json";
     Session s(str);
-	return 0;
+    s.start();
+
+
+    return 0;
 
 
 }

@@ -20,6 +20,7 @@ public:
     Session& operator=(Session&& other);
 
     void start();
+    std::vector<std::string>* split(std::string command);
 
     //getters
     const std::vector<Watchable*>& getContent();

@@ -165,9 +165,6 @@ const int Session::getIndexOfContent() { return indexOfContent; }
 bool Session::getIsRun() const { return isRunning; }
 bool Session::setIsRun(bool run) { isRunning=run; }
 
-void Session::start() {} //should be implemented sometime
-
-
 bool Session::deleteFromUserMap(std::string name) {
     if(userMap.find(name)==userMap.end())
         return false;
@@ -176,4 +173,105 @@ bool Session::deleteFromUserMap(std::string name) {
         return true;
     }
 }
+
+std::vector<std::string>* Session::split(std::string command) {
+    std::vector<std::string>* words=new std::vector<std::string>();
+    int index=0;
+    std::string word="";
+    for(auto& letter: command){
+        if(letter!=' ')
+        {
+            if(words->size()<index) {
+                words->push_back(word);
+                word="";
+            }
+            word=word +letter;
+        }
+        else{
+            index++;
+        }
+    }
+    words->push_back(word);
+    return words;
+}
+
+void Session::start() {
+    std::vector<std::string>* command;
+    int firstSpace;
+    BaseAction* baseAction;
+    std::cout<<"SPLFLIX is now on!"<<'\n';
+    activeUser=new LengthRecommenderUser("default");
+    setIsRun(true);
+    while(getIsRun()){
+        std::cin >>currentCommand;
+        command=split(currentCommand);
+        if(command->at(0).compare("createuser")==0) {
+            firstSpace = currentCommand.find(" ");
+            if (firstSpace < currentCommand.size()) {
+                currentCommand = currentCommand.substr(firstSpace + 1);
+                baseAction = new CreateUser();
+                baseAction->act(*this);
+                addToActionsLog(baseAction);
+            }
+        }
+        else if(command->at(0).compare("changeuser")==0) {
+            firstSpace = currentCommand.find(" ");
+            if (firstSpace < currentCommand.size()) {
+                currentCommand = currentCommand.substr(firstSpace + 1);
+                baseAction = new ChangeActiveUser();
+                baseAction->act(*this);
+                addToActionsLog(baseAction);
+            }
+        }
+        else if(command->at(0).compare("deleteuser")==0) {
+            firstSpace = currentCommand.find(" ");
+            if (firstSpace < currentCommand.size()) {
+                currentCommand = currentCommand.substr(firstSpace + 1);
+                baseAction = new DeleteUser();
+                baseAction->act(*this);
+                addToActionsLog(baseAction);
+            }
+        }
+        else if(command->at(0).compare("dupuser")==0) {
+            firstSpace = currentCommand.find(" ");
+            if (firstSpace < currentCommand.size()) {
+                currentCommand = currentCommand.substr(firstSpace + 1);
+                baseAction = new DuplicateUser();
+                baseAction->act(*this);
+                addToActionsLog(baseAction);
+            }
+        }
+        else if(command->at(0).compare("content")==0) {
+            baseAction = new PrintContentList();
+            baseAction->act(*this);
+            addToActionsLog(baseAction);
+        }
+        else if(command->at(0).compare("watchhist")==0) {
+            baseAction = new PrintWatchHistory();
+            baseAction->act(*this);
+            addToActionsLog(baseAction);
+        }
+        else if(command->at(0).compare("watch")==0) {
+            firstSpace = currentCommand.find(" ");
+            if (firstSpace < currentCommand.size()) {
+                currentCommand = currentCommand.substr(firstSpace + 1);
+                baseAction = new Watch();
+                baseAction->act(*this);
+                addToActionsLog(baseAction);
+            }
+        }
+        else if(command->at(0).compare("log")==0) {
+            baseAction = new PrintActionsLog();
+            baseAction->act(*this);
+            addToActionsLog(baseAction);
+        }
+        else if(command->at(0).compare("exit")==0) {
+            baseAction = new Exit();
+            baseAction->act(*this);
+            addToActionsLog(baseAction);
+        }
+    }
+
+}
+
 
