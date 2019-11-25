@@ -12,25 +12,32 @@ class Watchable;
 class Session{
 public:
     Session(const std::string &configFilePath);
+    //rule of 5
     Session(const Session& other);
     Session(Session&& other);
     ~Session();
     Session& operator=(Session& other);
     Session& operator=(Session&& other);
+
     void start();
+
+    //getters
     const std::vector<Watchable*>& getContent();
     Watchable* getContentByID(long id) const;
     const std::vector<BaseAction*>& getActionsLog();
     User* getUserFromMap(std::string name);
     User& getActiveUser() const;
+    std::string& getCurrentCommand();
+    const int getIndexOfContent();
+    bool getIsRun() const;
+
     void addToActionsLog(BaseAction* newAction);
     void addToUserMap(std::string name,User* newUserMap);
     bool deleteFromUserMap(std::string name);
+
+    //setters
     void setActiveUser(User* user);
-    std::string& getCurrentCommand();
-    void setCurrentCommand(std::string& currentCommand);  
-    const int getIndexOfContent();    
-    bool getIsRun() const;
+    void setCurrentCommand(std::string& currentCommand);
     bool setIsRun(bool run);
 
 private:

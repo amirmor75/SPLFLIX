@@ -10,7 +10,6 @@
 
 //Session Constructor
 Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand(""), isRunning(false) {
-    //activeUser=new User();
     using json= nlohmann::json;
     std::ifstream file(configFilePath);
     json j;
@@ -26,7 +25,6 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
     int seasonIndex;
     for(auto& element : series) {
         seasonIndex = 1;
-        std::cout << element["seasons"] << '\n';
         for (auto &season: element["seasons"]) {
             for (int i = 1; i <= season; i++) {
                 content.push_back(new Episode(content.size(), element["name"], element["episode_length"],i,seasonIndex, element["tags"]));
@@ -143,9 +141,7 @@ Session::~Session() {
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
 User& Session::getActiveUser() const{ return  *activeUser;}
 const std::vector<Watchable*>& Session::getContent() { return  content;}
-User* Session::getUserFromMap(std::string name) {
-    return  userMap.at(name);
-}
+User* Session::getUserFromMap(std::string name) { return  userMap.at(name); }
 Watchable* Session::getContentByID(long id) const{
     for(auto& watch: content){
         if(watch->getId()==id)

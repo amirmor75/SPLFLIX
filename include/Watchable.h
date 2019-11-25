@@ -16,11 +16,14 @@ public:
     virtual std::string toString() const = 0;
     virtual std::string printAll() const = 0;
     virtual Watchable* getNextWatchable(Session&) const = 0;
+    virtual void recommendMe(User&  u)=0;
+    virtual Watchable* clone()=0;
+
+    //getters
     const long &getId() const;
     int getLength() const;
-    virtual Watchable* clone()=0;
     const std::vector<std::string> & getTags() const;
-    virtual void recommendMe(User&  u)=0;
+
 
 private:
     const long id;

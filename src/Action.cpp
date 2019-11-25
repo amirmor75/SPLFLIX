@@ -44,6 +44,7 @@ std::vector<std::string>* BaseAction::split(std::string command) {
 
 
 //+++ CreateUser +++
+CreateUser::CreateUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void CreateUser::act(Session &sess) {
     if(split(sess.getCurrentCommand())->size()==2) {
         std::string& command=sess.getCurrentCommand();
@@ -80,6 +81,7 @@ BaseAction* CreateUser::clone() {
 }
 
 //+++ ChangeActiveUser +++
+ChangeActiveUser::ChangeActiveUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void ChangeActiveUser::act(Session &sess) {
     if(split(sess.getCurrentCommand())->size()==1) {
         std::string& command=sess.getCurrentCommand();
