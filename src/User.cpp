@@ -9,6 +9,8 @@
 #include "Session.h"
 
 
+
+//User S
 User::User(const std::string &name): name(name)
 {}
 std::string User::getName() const { return name;}
@@ -16,6 +18,7 @@ std::vector<Watchable*> User::get_history() const {return history;}
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
 User* User::clone() {}
 
+//5 Rule S
 User::~User() {
     for (Watchable* w:history) {
         delete w;
@@ -25,9 +28,42 @@ User::User(const User &other): name(other.name) {
     for (int i = 0; i <history.size(); ++i)
         this->history[i]=other.history[i]->clone();
 }
+User::User(User &&other):name(other.getName()),history(other.get_history()) {
+    other.name= nullptr;
+    other.history.clear();
+}
+User& User::operator=(User &other) {
+    if (this!=&other){
+        name= nullptr;
+        for(Watchable* w:history)
+            delete w;
+        history.clear();
+        this->name=other.name;
+        for (int i = 0; i < other.history.size(); ++i)
+            this->history.push_back(other.history.at(i)->clone());
+    }
+    return (*this);
+}
+User& User::operator=(User &&other) {
+    if(this!=&other){
+        this->name= nullptr;
+        name= nullptr;
+        for(Watchable* w:history)
+            delete w;
+        history.clear();
+        this->name=other.name;
+        this->history=other.history;
+        for (Watchable* w:other.history)
+            w= nullptr;
+        other.history.clear();
+    }
 
+    return *this;
+}
 
+//5 Rule F
 
+//User F
 
 Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
     for (int i = 0; i < history.size(); ++i) {
