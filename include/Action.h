@@ -20,7 +20,6 @@ public:
 	virtual std::string toString() const=0;
 	std::string getErrorMsgPublic() const;
 	virtual BaseAction* clone()=0;
-    std::vector<std::string>* split(std::string command);
 
 protected:
 	void complete();
@@ -33,6 +32,7 @@ private:
 
 class CreateUser  : public BaseAction {
 public:
+    CreateUser();
     CreateUser(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
 	virtual std::string toString() const;
@@ -41,6 +41,7 @@ public:
 
 class ChangeActiveUser : public BaseAction {
 public:
+    ChangeActiveUser();
     ChangeActiveUser(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
 	virtual std::string toString() const;
@@ -49,6 +50,7 @@ public:
 
 class DeleteUser : public BaseAction {
 public:
+    DeleteUser();
     DeleteUser(std::string errorMsg,ActionStatus status);
 	virtual void act(Session & sess);
 	virtual std::string toString() const;
@@ -58,6 +60,7 @@ public:
 
 class DuplicateUser : public BaseAction {
 public:
+    DuplicateUser();
     DuplicateUser(std::string errorMsg,ActionStatus status);
     virtual void act(Session & sess);
 	virtual std::string toString() const;
@@ -66,6 +69,7 @@ public:
 
 class PrintContentList : public BaseAction {
 public:
+    PrintContentList();
     PrintContentList(std::string errorMsg,ActionStatus status);
 	virtual void act (Session& sess);
 	virtual std::string toString() const;
@@ -74,6 +78,7 @@ public:
 
 class PrintWatchHistory : public BaseAction {
 public:
+    PrintWatchHistory();
     PrintWatchHistory(std::string errorMsg,ActionStatus status);
     virtual void act (Session& sess);
 	virtual std::string toString() const;
@@ -83,6 +88,7 @@ public:
 
 class Watch : public BaseAction {
 public:
+    Watch();
     Watch(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
 	virtual std::string toString() const;
@@ -92,6 +98,7 @@ public:
 
 class PrintActionsLog : public BaseAction {
 public:
+    PrintActionsLog();
     PrintActionsLog(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
 	virtual std::string toString() const;
@@ -100,6 +107,7 @@ public:
 
 class Exit : public BaseAction {
 public:
+    Exit();
     Exit(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
 	virtual std::string toString() const;

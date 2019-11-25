@@ -16,11 +16,14 @@ public:
     virtual std::string toString() const = 0;
     virtual std::string printAll() const = 0;
     virtual Watchable* getNextWatchable(Session&) const = 0;
+    virtual void recommendMe(User&  u)=0;
+    virtual Watchable* clone()=0;
+
+    //getters
     const long &getId() const;
     int getLength() const;
-    virtual Watchable* clone()=0; //need to implement in sub classes
     const std::vector<std::string> & getTags() const;
-    virtual void recommendMe(User&  u)=0;
+
 
 private:
     const long id;
@@ -31,11 +34,11 @@ private:
 class Movie : public Watchable{
 public:
     Movie(long id, const std::string& name, int length, const std::vector<std::string>& tags);
-    std::string toString(bool print_full=false) const;
-    std::string printAll();
+    virtual std::string toString() const;
+    std::string printAll() const;
     virtual Watchable* getNextWatchable(Session&) const;
     virtual void recommendMe(User&  u);
-    Watchable* clone(); //need to implement
+    Watchable* clone();
 private:
     std::string name;
 };
@@ -44,11 +47,11 @@ private:
 class Episode: public Watchable{
 public:
     Episode(long id, const std::string& seriesName,int length, int season, int episode ,const std::vector<std::string>& tags);
-    std::string toString(bool print_full=false) const;
-    std::string printAll();
+    virtual std::string toString() const;
+    std::string printAll() const;
     virtual Watchable* getNextWatchable(Session&) const;
     virtual void recommendMe(User&  u);
-    Watchable* clone();//need to implement
+    Watchable* clone();
 private:
     std::string seriesName;
     int season;
