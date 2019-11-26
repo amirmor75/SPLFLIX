@@ -8,24 +8,20 @@
 #include "Watchable.h"
 #include "Session.h"
 
-
-
-
 //User S
 User::User(const std::string &name): name(name),history(),lastrecommended(0){}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
 //5 Rule S
 User::~User() {
+
     for(Watchable* w:history){
         delete w;
     }
     history.clear();
     name= nullptr;
 }
-User::User(User &other){
-    name=other.name;
-    lastrecommended=other.lastrecommended;
+User::User(User &other)name(other.name), lastrecommended(other.lastrecommended){    
     for(Watchable* w: other.get_history())
         this->history.push_back(w->clone());
 }
@@ -40,19 +36,19 @@ User::User(User &&other){
     other.history.clear();
 }
 User& User::operator=(User &other) {
+    this->name=other.name;
+    lastrecommended=other.lastrecommended;
     if (this!=&other){
         for(Watchable* w: this->history)
             delete w;
         history.clear();
-        this->name=other.name;
-        lastrecommended=other.lastrecommended;
-        for (int i = 0; i < other.history.size(); ++i)
+        for (int i = 0; i < other.history.size(); i++)
             this->history.push_back(other.history.at(i)->clone());
     }
     return (*this);
 }
-User& User::operator=(User &&other) {
 
+User& User::operator=(User &&other) {
     name= nullptr;
     for(Watchable* w:history)
         delete w;
@@ -70,9 +66,13 @@ User& User::operator=(User &&other) {
     return *this;
 }
 //5 Rule F
+
+   
 void User::setName(std::string &newName) {
     name=newName;
 }
+void User::addToHistory(Watchable *watch) { history.push_back(watch); }
+
 //User F
 
 //userLEN S

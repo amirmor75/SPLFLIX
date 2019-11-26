@@ -31,7 +31,9 @@ public:
     //5 Rule F
     User(const std::string &name,std::vector<Watchable*> history);
     virtual User* clone()=0;
+    void addToHistory(Watchable* watch);
     void setName(std::string & name);
+
     // all is given
     protected:
     std::vector<Watchable*> history;

@@ -38,10 +38,7 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
 //5 Rule S
 //Session copy constructor
 Session::Session(const Session &other): isRunning(other.isRunning), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent){
-    activeUser=other.activeUser->clone(); //need to implement clone func
- //   for(std::vector<Watchable*>::const_iterator i = content.begin(); i!= content.end(); i++)
-   //     content.push_back((*i)->clone());
-
+    activeUser=other.activeUser->clone();
     for(int i=0;i<other.content.size();i++){
         content.push_back(other.content.at(i)->clone());
     }
