@@ -21,7 +21,7 @@ public:
     //given
     //5 Rule S
     ~User();
-    User(const User& other);
+    User(User& other);
     User(User&& other);
     User& operator=(User& other);
     User& operator=(User&& other);
@@ -57,7 +57,7 @@ public:
     //given
     virtual void buildMe(User* u) const ;
 
-    RerunRecommenderUser(const std::string& name, int index);
+
 
     virtual User* clone();
 private:
@@ -71,7 +71,8 @@ public:
     //given
     virtual void buildMe(User* u)const;
     virtual User* clone();
-    std::string mostPopTag();
+    std::string mostPopTag(const std::unordered_map<std::string,int>& badTags) const;
+
 private:
 };
 

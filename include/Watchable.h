@@ -57,7 +57,7 @@ public:
     //given
     Episode(Episode& other);
     virtual Watchable* clone();
-    virtual bool isEpisode()
+    virtual bool isEpisode();
     //getters
     std::string getSeriesName();
     int getEpisode();

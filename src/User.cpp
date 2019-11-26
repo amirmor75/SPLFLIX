@@ -11,7 +11,7 @@
 
 
 //User S
-User::User(const std::string &name): name(name),history(){}
+User::User(const std::string &name): name(name),history(),lastrecommended(0){}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
 //5 Rule S
@@ -20,7 +20,7 @@ User::~User() {
         delete w;
     }
 }
-User::User(const User &other){
+User::User(User &other){
     other.buildMe(this);
     for (int i = 0; i < other.history.size(); ++i) {
         this->history[i]=other.history[i]->clone();
@@ -107,7 +107,7 @@ void LengthRecommenderUser::buildMe(User *u) const {
 
 
 //userRER S
-RerunRecommenderUser::
+
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
     if(nextEpisode!= nullptr){
@@ -118,7 +118,6 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
         else
             return nullptr;
     }
-
 
 }
 void RerunRecommenderUser::buildMe(User *u) const {
@@ -134,17 +133,7 @@ User* RerunRecommenderUser::clone() {
 
 //userGEN S
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}
-std::string GenreRecommenderUser::mostPopTag() {
-    std::unordered_map<std::string,int> amountOfTags;
-    for(auto& watch: history){
-        for(auto& tag: watch->getTags()){
-            if(amountOfTags.find(tag)==amountOfTags.end())//this tag not exists
-                amountOfTags[tag]=1;
-            else
-                amountOfTags[tag]++;
-        }
-    }
-
+std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::string,int>& amountOfTags ) const {
     std::string popTag="";
     int amount=0;
     for(auto& tag: amountOfTags)
@@ -166,7 +155,48 @@ std::string GenreRecommenderUser::mostPopTag() {
     }
     return popTag;
 }
+Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
 
+
+    Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
+    if(nextEpisode!= nullptr){
+        return nextEpisode;
+    } else {
+
+
+        //init of TagMap S
+        std::unordered_map<std::string,int> tagMap;
+        for(Watchable* watch: history){
+            for(std::string tag: watch->getTags()){
+                if(tagMap.find(tag)==tagMap.end())//this tag not exists
+                    tagMap[tag]=1;
+                else
+                    tagMap[tag]++;
+            }
+        }
+        //init of TagMap F
+        const std::vector<Watchable *> &content = s.getContent();
+
+        std::string s=mostPopTag(tagMap);//first poptag
+        bool beenWatched= false;
+        while (s.compare("")!=0 ) {
+            for (Watchable *show:content) {
+                for (Watchable *watched:history) {//checks if show been watched
+                    if (watched->getId() == show->getId())
+                        beenWatched = true;
+                }
+                if (!beenWatched) {
+                    for (std::string tag:show->getTags()) {//checks if show has relevant tag
+                        if (s.compare(tag) == 0)
+                            return show;
+                    }
+                }
+            }
+            tagMap.erase(s);
+            s=mostPopTag(tagMap);
+        }
+    }
+}
 void GenreRecommenderUser::buildMe(User *u) const {
     u=new GenreRecommenderUser(this->getName());
 }
