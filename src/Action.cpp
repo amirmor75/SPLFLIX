@@ -121,8 +121,9 @@ void DuplicateUser::act(Session &sess) {
         User* newUser=sess.getUserFromMap(newName);
         if(newUser== nullptr) {
             if (user != nullptr) {
-                User *user = user->duplicateUser(newName);
-                sess.addToUserMap(newName, user);
+                newUser = user->clone();
+                newUser->setName(newName);
+                sess.addToUserMap(newName, newUser);
                 complete();
             } else {
                 error(name + " is not an exist user");

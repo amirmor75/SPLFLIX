@@ -12,11 +12,10 @@ int main(int argc, char** argv){
 	}
 	Session s(argv[1]);
 	s.start();
-
+*/
     std:string str="/home/tal/CLionProjects/SPLFLIX/src/config1.json";
     Session s(str);
-	return 0;
-*/
+	//return 0;
 
     s.start();
 
