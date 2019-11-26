@@ -192,9 +192,9 @@ void Watch::act(Session &sess) {
         std::string &idStr = words->at(0);
         Watchable* watch=sess.getContentByID(stoi(idStr));
         if (watch!= nullptr) {
+            sess.getActiveUser()->add
             std::string name="Watching "+watch->toString();
             std::cout<<name<<'\n';
-            sess.getActiveUser().get_history().push_back(watch);
             Watchable* nextWatch=sess.getActiveUser().getRecommendation(sess);
             name="We recommend watching "+nextWatch->toString()+", continue watching? [y/n]";
             char answer;

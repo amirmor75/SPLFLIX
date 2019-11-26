@@ -35,6 +35,7 @@ public:
     std::vector<Watchable*> get_history() const;
     virtual User* duplicateUser(std::string &name)=0;
     virtual User* clone()=0;
+    void addToHistory(Watch * watch);
   
     // all is given
     protected:

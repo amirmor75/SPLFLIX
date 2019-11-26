@@ -64,6 +64,8 @@ User& User::operator=(User &&other) {
     return *this;
 }
 //5 Rule F
+
+
 //User F
 
 //userLEN S
