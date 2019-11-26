@@ -10,7 +10,9 @@
 
 //User S
 User::User(const std::string &name): name(name),history(),lastrecommended(0){}
-std::string User::getName() const { return name;}
+User::User(const std::string &name, std::vector<Watchable *> history) {
+
+}
 std::vector<Watchable*> User::get_history() const {return history;}
 //5 Rule S
 User::~User() {
@@ -109,7 +111,7 @@ User* LengthRecommenderUser::clone() {
 
 
 //userRER S
-
+RerunRecommenderUser::RerunRecommenderUser(const std::string &name): User(name){}
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
     if(nextEpisode!= nullptr){

@@ -23,7 +23,7 @@ public:
     //5 Rule F
   
     void start();
-    std::vector<std::string>* split(std::string command);
+    void split(std::string& str, std::vector<std::string>& out);
 
     //getters S
     const std::vector<Watchable*>& getContent();

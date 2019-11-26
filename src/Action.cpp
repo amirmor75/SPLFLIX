@@ -28,10 +28,11 @@ CreateUser::CreateUser() :BaseAction(){}
 CreateUser::CreateUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void CreateUser::act(Session &sess) {
     std::string& command=sess.getCurrentCommand();
-    std::vector<std::string>* words=sess.split(command);
-    if(words->size()==2) {
-        std::string& name =  words->at(0);
-        std::string& algorithm=words->at(1);
+    std::vector<std::string> words;
+    sess.split(command,words);
+    if(words.size()==2) {
+        std::string& name =  words.at(0);
+        std::string& algorithm=words.at(1);
         User *user;
         if(sess.getUserFromMap(name)== nullptr) {
             if (command.compare("gen") == 0) {
@@ -66,10 +67,11 @@ BaseAction* CreateUser::clone() {
 ChangeActiveUser::ChangeActiveUser() :BaseAction(){}
 ChangeActiveUser::ChangeActiveUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void ChangeActiveUser::act(Session &sess) {
-    std::vector<std::string>* words=sess.split(sess.getCurrentCommand());
-    if(words->size()==1) {
+    std::vector<std::string> words;
+    sess.split(sess.getCurrentCommand(),words);
+    if(words.size()==1) {
         std::string& command=sess.getCurrentCommand();
-        std::string& name =  words->at(0);
+        std::string& name =  words.at(0);
         User *user = sess.getUserFromMap(name);
         if(user!=nullptr){
             sess.setActiveUser(user);
@@ -91,9 +93,10 @@ BaseAction* ChangeActiveUser::clone() {
 DeleteUser::DeleteUser() :BaseAction(){}
 DeleteUser::DeleteUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DeleteUser::act(Session &sess) {
-    std::vector<std::string>* words=sess.split(sess.getCurrentCommand());
-    if(words->size()==1) {
-        std::string &name = words->at(0);
+    std::vector<std::string> words;
+    sess.split(sess.getCurrentCommand(),words);
+    if(words.size()==1) {
+        std::string &name = words.at(0);
         if (sess.deleteFromUserMap(name)) {
             complete();
         } else {
@@ -113,10 +116,11 @@ DuplicateUser::DuplicateUser() :BaseAction(){}
 DuplicateUser::DuplicateUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DuplicateUser::act(Session &sess) {
     std::string command=sess.getCurrentCommand();
-    std::vector<std::string>* words=sess.split(command);
-    if(words->size()==2) {
-        std::string &name = words->at(0);
-        std::string &newName = words->at(1);
+    std::vector<std::string> words;
+    sess.split(command,words);
+    if(words.size()==2) {
+        std::string &name = words.at(0);
+        std::string &newName = words.at(1);
         User* user=sess.getUserFromMap(name);
         User* newUser=sess.getUserFromMap(newName);
         if(newUser== nullptr) {
@@ -148,10 +152,7 @@ void PrintContentList::act(Session &sess) {
     int index=1;
     std::string str="";
     for(auto& watch: sess.getContent()) {
-        str=index+". ";
-        str+=watch->toString()+" ";
-        str+=watch->printAll();
-        std::cout << str << '\n';
+        printf("%d. %s %s \n",index,watch->toString().c_str(),watch->printAll().c_str());
         index++;
     }
     complete();
@@ -188,10 +189,12 @@ BaseAction* PrintWatchHistory::clone() {
 Watch::Watch() :BaseAction(){}
 Watch::Watch(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void Watch::act(Session &sess) {
-    std::vector<std::string>* words=sess.split(sess.getCurrentCommand());
-    if(words->size()==1) {
-        std::string &idStr = words->at(0);
+    std::vector<std::string> words;
+    sess.split(sess.getCurrentCommand(),words);
+    if(words.size()==1) {
+        std::string &idStr = words.at(0);
         Watchable* watch=sess.getContentByID(stoi(idStr));
+        std::cout<<watch->toString();
         if (watch!= nullptr) {
             sess.getActiveUser().addToHistory(watch);
             std::string name="Watching "+watch->toString();

@@ -19,7 +19,6 @@ public:
     //given
     User(const std::string& name);
     virtual Watchable *getRecommendation(Session &s) const = 0;
-    std::string getName() const;
     std::vector<Watchable*> get_history() const;
     //given
     //5 Rule S

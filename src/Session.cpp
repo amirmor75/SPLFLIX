@@ -7,6 +7,7 @@
 #include <fstream>
 #include <Watchable.h>
 #include <User.h>
+#include <iostream>
 
 //Session Constructor
 Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand(""), isRunning(false) {
@@ -25,9 +26,9 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
     int seasonIndex;
     for(auto& element : series) {
         seasonIndex = 1;
-        for (auto &season: element["seasons"]) {
+        for (int season: element["seasons"]) {
             for (int i = 1; i <= season; i++) {
-                content.push_back(new Episode(content.size(), element["name"], element["episode_length"],i,seasonIndex, element["tags"]));
+                content.push_back(new Episode(content.size(), element["name"], element["episode_length"],seasonIndex,i, element["tags"]));
             }
             seasonIndex++;
         }
@@ -173,29 +174,19 @@ bool Session::deleteFromUserMap(std::string name) {
     }
 }
 
-std::vector<std::string>* Session::split(std::string command) {
-    std::vector<std::string>* words=new std::vector<std::string>();
-    int index=0;
-    std::string word="";
-    for(auto& letter: command){
-        if(letter!=' ')
-        {
-            if(words->size()<index) {
-                words->push_back(word);
-                word="";
-            }
-            word=word +letter;
-        }
-        else{
-            index++;
-        }
+void Session::split(std::string &str, std::vector<std::string> &out) {
+    size_t start;
+    size_t end = 0;
+    out.clear();
+    while ((start = str.find_first_not_of(' ', end)) != std::string::npos)
+    {
+        end = str.find(' ', start);
+        out.push_back(str.substr(start, end - start));
     }
-    words->push_back(word);
-    return words;
 }
 
 void Session::start() {
-    std::vector<std::string>* command;
+    std::vector<std::string> command;
     int firstSpace;
     BaseAction* baseAction;
     std::cout<<"SPLFLIX is now on!"<<'\n';
@@ -203,9 +194,11 @@ void Session::start() {
     //addToUserMap("default",activeUser);
     setIsRun(true);
     while(getIsRun()){
-        std::cin >>currentCommand;
-        command=split(currentCommand);
-        if(command->at(0).compare("createuser")==0) {
+        std::getline(std::cin, currentCommand);
+        if(command.size()>0)
+            split(currentCommand,command);
+
+        if(command.at(0).compare("createuser")==0) {
             firstSpace = currentCommand.find(" ");
             if (firstSpace < currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
@@ -214,7 +207,7 @@ void Session::start() {
                 addToActionsLog(baseAction);
             }
         }
-        else if(command->at(0).compare("changeuser")==0) {
+        else if(command.at(0).compare("changeuser")==0) {
             firstSpace = currentCommand.find(" ");
             if (firstSpace < currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
@@ -223,7 +216,7 @@ void Session::start() {
                 addToActionsLog(baseAction);
             }
         }
-        else if(command->at(0).compare("deleteuser")==0) {
+        else if(command.at(0).compare("deleteuser")==0) {
             firstSpace = currentCommand.find(" ");
             if (firstSpace < currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
@@ -232,7 +225,7 @@ void Session::start() {
                 addToActionsLog(baseAction);
             }
         }
-        else if(command->at(0).compare("dupuser")==0) {
+        else if(command.at(0).compare("dupuser")==0) {
             firstSpace = currentCommand.find(" ");
             if (firstSpace < currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
@@ -241,31 +234,31 @@ void Session::start() {
                 addToActionsLog(baseAction);
             }
         }
-        else if(command->at(0).compare("content")==0) {
+        else if(command.at(0).compare("content")==0) {
             baseAction = new PrintContentList();
             baseAction->act(*this);
             addToActionsLog(baseAction);
         }
-        else if(command->at(0).compare("watchhist")==0) {
+        else if(command.at(0).compare("watchhist")==0) {
             baseAction = new PrintWatchHistory();
             baseAction->act(*this);
             addToActionsLog(baseAction);
         }
-        else if(command->at(0).compare("watch")==0) {
+        else if(command.at(0).compare("watch")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace < currentCommand.size()) {
+            if (firstSpace <= currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new Watch();
                 baseAction->act(*this);
                 addToActionsLog(baseAction);
             }
         }
-        else if(command->at(0).compare("log")==0) {
+        else if(command.at(0).compare("log")==0) {
             baseAction = new PrintActionsLog();
             baseAction->act(*this);
             addToActionsLog(baseAction);
         }
-        else if(command->at(0).compare("exit")==0) {
+        else if(command.at(0).compare("exit")==0) {
             baseAction = new Exit();
             baseAction->act(*this);
             addToActionsLog(baseAction);

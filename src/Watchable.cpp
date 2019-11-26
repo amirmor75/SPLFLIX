@@ -59,7 +59,7 @@ std::string Movie::printAll() const {
     return std::to_string(getLength())+" minutes "+ tagsList;
 }
 std::string Episode::toString() const {
-    return (getId()+1)+". "+seriesName+" S"+std::to_string(season)+"E"+std::to_string(episode);
+    return seriesName+" S"+std::to_string(season)+"E"+std::to_string(episode);
 }
 std::string Episode::printAll() const {
     std::string tagsList="[";
