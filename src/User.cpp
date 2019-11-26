@@ -17,24 +17,31 @@ std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
 //5 Rule S
 User::~User() {
+    for(Watchable* w:history){
+        delete w;
+    }
     history.clear();
     name= nullptr;
 }
-/*
 User::User(User &other){
     name=other.name;
     lastrecommended=other.lastrecommended;
-    for(auto& hist: other.get_history())
-        this->history.push_back(hist);
+    for(Watchable* w: other.get_history())
+        this->history.push_back(w->clone());
 }
 User::User(User &&other){
     name=other.name;
+    other.name= nullptr;
+
     lastrecommended=other.lastrecommended;
+    other.lastrecommended=0;
+
     this->history=other.history;
+    other.history.clear();
 }
 User& User::operator=(User &other) {
     if (this!=&other){
-        for(Watchable* w:history)
+        for(Watchable* w: this->history)
             delete w;
         history.clear();
         this->name=other.name;
@@ -45,21 +52,24 @@ User& User::operator=(User &other) {
     return (*this);
 }
 User& User::operator=(User &&other) {
-    if(this!=&other){
-        name= nullptr;
-        for(Watchable* w:history)
-            delete w;
-        history.clear();
-        this->name=other.name;
-        this->history=other.history;
-        for (Watchable* w:other.history)
-            w= nullptr;
-        other.history.clear();
-    }
+
+    name= nullptr;
+    for(Watchable* w:history)
+        delete w;
+    history.clear();
+    lastrecommended=0;
+
+    this->name=other.name;
+    this->lastrecommended=other.lastrecommended;
+    this->history=other.history;
+
+    other.history.clear();
+    other.lastrecommended=0;
+    other.name= nullptr;
+
     return *this;
 }
 //5 Rule F
-*/
 void User::setName(std::string &newName) {
     name=newName;
 }
@@ -103,14 +113,11 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
 User* LengthRecommenderUser::clone() {
     return new LengthRecommenderUser(*this);
 }
-
-
-
 //userLEN F
 
 
 //userRER S
-
+RerunRecommenderUser::RerunRecommenderUser(const std::string &name):User(name) {};
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
     if(nextEpisode!= nullptr){
@@ -123,8 +130,6 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
     }
 
 }
-
-
 User* RerunRecommenderUser::clone() {
     return new RerunRecommenderUser(*this);
 }
@@ -164,8 +169,6 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
     if(nextEpisode!= nullptr){
         return nextEpisode;
     } else {
-
-
         //init of TagMap S
         std::unordered_map<std::string,int> tagMap;
         for(Watchable* watch: history){

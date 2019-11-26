@@ -69,7 +69,6 @@ class GenreRecommenderUser : public User {
 public:
     //given
     GenreRecommenderUser(const std::string& name);
-
     virtual Watchable *getRecommendation(Session &s) const;
     //given
     virtual User* clone();
