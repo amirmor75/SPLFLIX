@@ -26,7 +26,7 @@ public:
     //getters
 
     virtual std::string printAll() const = 0;    
-    virtual Watchable* clone()=0;
+
 
     
 private:

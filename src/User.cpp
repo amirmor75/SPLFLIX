@@ -8,55 +8,47 @@
 #include "Watchable.h"
 #include "Session.h"
 
-
-
-
 //User S
 User::User(const std::string &name): name(name),history(),lastrecommended(0){}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
-// contriversal
-User* User::clone() {}
-// contriversal  
 //5 Rule S
 User::~User() {
-    for (Watchable* w:history) {
-        delete w;
+    for(auto& hist:history)
+        delete hist;
+}
+
+User::User(User &other):name(other.name), lastrecommended(other.lastrecommended){
+    for(auto& hist: other.get_history())
+        this->history.push_back(hist->clone());
+}
+
+User::User(User &&other):name(other.name), lastrecommended(other.lastrecommended), history(other.history){
+    for(int i=0;i<other.history.size();i++){
+        other.history.at(i)= nullptr;
     }
 }
-User::User(User &other){
-    other.buildMe(this);
-    for (int i = 0; i < other.history.size(); ++i) {
-        this->history[i]=other.history[i]->clone();
-    }
-}
-User::User(User &&other){
-    other.buildMe(this);
-    this->history=other.history;
-    other.name= nullptr;
-    other.history.clear();
-}
+
 User& User::operator=(User &other) {
+    this->name=other.name;
+    lastrecommended=other.lastrecommended;
     if (this!=&other){
-        name= nullptr;
         for(Watchable* w:history)
             delete w;
         history.clear();
-        this->name=other.name;
-        for (int i = 0; i < other.history.size(); ++i)
+        for (int i = 0; i < other.history.size(); i++)
             this->history.push_back(other.history.at(i)->clone());
     }
     return (*this);
 }
+
 User& User::operator=(User &&other) {
+    this->name=other.name;
+    this->history=other.history;
     if(this!=&other){
-        this->name= nullptr;
-        name= nullptr;
         for(Watchable* w:history)
             delete w;
         history.clear();
-        this->name=other.name;
-        this->history=other.history;
         for (Watchable* w:other.history)
             w= nullptr;
         other.history.clear();
@@ -65,6 +57,10 @@ User& User::operator=(User &&other) {
 }
 //5 Rule F
 
+void User::setName(std::string &newName) {
+    name=newName;
+}
+void User::addToHistory(Watchable *watch) { history.push_back(watch); }
 
 //User F
 
@@ -103,21 +99,12 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
     return nullptr;
 }
 
-User* LengthRecommenderUser::duplicateUser(std::string &name) {
-    User* newUser=new LengthRecommenderUser(name);
-    for(auto& watch: get_history()){
-        newUser->get_history().push_back(watch->clone());
-    }
-    return newUser;
-}
-
 User* LengthRecommenderUser::clone() {
     return new LengthRecommenderUser(*this);
 }
 
-void LengthRecommenderUser::buildMe(User *u) const {
-    u=new LengthRecommenderUser(this->getName());
-}
+
+
 //userLEN F
 
 
@@ -135,16 +122,8 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
     }
 
 }
-void RerunRecommenderUser::buildMe(User *u) const {
-    u=new RerunRecommenderUser(this->getName());
-}
-User* RerunRecommenderUser::duplicateUser(std::string &name) {
-    User* newUser=new RerunRecommenderUser(name);
-    for(auto& watch: get_history()){
-        newUser->get_history().push_back(watch->clone());
-    }
-    return newUser;
-}
+
+
 User* RerunRecommenderUser::clone() {
     return new RerunRecommenderUser(*this);
 }
@@ -204,7 +183,7 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
         while (s.compare("")!=0 ) {
             for (Watchable *show:content) {
                 for (Watchable *watched:history) {//checks if show been watched
-                    if (watched->getId() == show->getId())
+                    if (watched==show)
                         beenWatched = true;
                 }
                 if (!beenWatched) {
@@ -218,17 +197,6 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
             s=mostPopTag(tagMap);
         }
     }
-}
-
-void GenreRecommenderUser::buildMe(User *u) const {
-    u=new GenreRecommenderUser(this->getName());}
-
-User* GenreRecommenderUser::duplicateUser(std::string &name) {
-    User* newUser=new GenreRecommenderUser(name);
-    for(auto& watch: get_history()){
-        newUser->get_history().push_back(watch->clone());
-    }
-    return newUser;
 }
 
 User* GenreRecommenderUser::clone() {

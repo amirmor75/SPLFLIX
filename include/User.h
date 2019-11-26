@@ -29,14 +29,11 @@ public:
     User& operator=(User& other);
     User& operator=(User&& other);
     //5 Rule F
-    virtual void buildMe(User* u) const =0;   
-    User(const std::string &name,std::vector<Watchable*> history);    
-    std::string getName() const;
-    std::vector<Watchable*> get_history() const;
-    virtual User* duplicateUser(std::string &name)=0;
+    User(const std::string &name,std::vector<Watchable*> history);
     virtual User* clone()=0;
-    void addToHistory(Watch * watch);
-  
+    void addToHistory(Watchable* watch);
+    void setName(std::string & name);
+
     // all is given
     protected:
     std::vector<Watchable*> history;
@@ -51,12 +48,10 @@ class LengthRecommenderUser : public User {
 public:
     //given
     LengthRecommenderUser(const std::string& name);
-
     virtual Watchable *getRecommendation(Session &s) const;
     //given
-    virtual void buildMe(User* u) const;   
-    virtual User* duplicateUser(std::string &name);
     virtual User* clone();
+
 private:
 };
 
@@ -66,10 +61,8 @@ public:
     RerunRecommenderUser(const std::string& name);
     virtual Watchable *getRecommendation(Session &s) const ;
     //given
-    virtual void buildMe(User* u) const ;
     virtual User* clone();      
-    User* duplicateUser(std::string &name);
-    
+
 
 private:
 };
@@ -78,13 +71,10 @@ class GenreRecommenderUser : public User {
 public:
     //given
     GenreRecommenderUser(const std::string& name);
-
     virtual Watchable *getRecommendation(Session &s) const;
     //given
-    virtual void buildMe(User* u)const;
     virtual User* clone();
     std::string mostPopTag(const std::unordered_map<std::string,int>& tagMap) const;    
-    User* duplicateUser(std::string &name);   
 private:
 };
 

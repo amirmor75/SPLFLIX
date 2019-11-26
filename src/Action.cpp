@@ -121,8 +121,9 @@ void DuplicateUser::act(Session &sess) {
         User* newUser=sess.getUserFromMap(newName);
         if(newUser== nullptr) {
             if (user != nullptr) {
-                User *user = user->duplicateUser(newName);
-                sess.addToUserMap(newName, user);
+                newUser = user->clone();
+                newUser->setName(newName);
+                sess.addToUserMap(newName, newUser);
                 complete();
             } else {
                 error(name + " is not an exist user");
@@ -192,7 +193,7 @@ void Watch::act(Session &sess) {
         std::string &idStr = words->at(0);
         Watchable* watch=sess.getContentByID(stoi(idStr));
         if (watch!= nullptr) {
-            sess.getActiveUser()->add
+            sess.getActiveUser().addToHistory(watch);
             std::string name="Watching "+watch->toString();
             std::cout<<name<<'\n';
             Watchable* nextWatch=sess.getActiveUser().getRecommendation(sess);
