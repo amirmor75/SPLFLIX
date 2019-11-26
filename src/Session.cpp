@@ -34,6 +34,8 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
     }
 }
 
+
+//5 Rule S
 //Session copy constructor
 Session::Session(const Session &other): isRunning(other.isRunning), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent){
     activeUser=other.activeUser->clone(); //need to implement clone func
@@ -137,7 +139,7 @@ Session::~Session() {
     }
     delete activeUser;
 }
-
+//5 Rule F
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
 User& Session::getActiveUser() const{ return  *activeUser;}
 const std::vector<Watchable*>& Session::getContent() { return  content;}

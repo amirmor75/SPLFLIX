@@ -8,41 +8,99 @@
 #include "Watchable.h"
 #include "Session.h"
 
-//+++ User +++
-User::User(const std::string &name): name(name){}
+
+
+
+//User S
+User::User(const std::string &name): name(name),history(),lastrecommended(0){}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
+// contriversal
 User* User::clone() {}
+// contriversal  
+//5 Rule S
+User::~User() {
+    for (Watchable* w:history) {
+        delete w;
+    }
+}
+User::User(User &other){
+    other.buildMe(this);
+    for (int i = 0; i < other.history.size(); ++i) {
+        this->history[i]=other.history[i]->clone();
+    }
+}
+User::User(User &&other){
+    other.buildMe(this);
+    this->history=other.history;
+    other.name= nullptr;
+    other.history.clear();
+}
+User& User::operator=(User &other) {
+    if (this!=&other){
+        name= nullptr;
+        for(Watchable* w:history)
+            delete w;
+        history.clear();
+        this->name=other.name;
+        for (int i = 0; i < other.history.size(); ++i)
+            this->history.push_back(other.history.at(i)->clone());
+    }
+    return (*this);
+}
+User& User::operator=(User &&other) {
+    if(this!=&other){
+        this->name= nullptr;
+        name= nullptr;
+        for(Watchable* w:history)
+            delete w;
+        history.clear();
+        this->name=other.name;
+        this->history=other.history;
+        for (Watchable* w:other.history)
+            w= nullptr;
+        other.history.clear();
+    }
+    return *this;
+}
+//5 Rule F
+//User F
 
-//+++ LengthRecommenderUser +++
+//userLEN S
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
-Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
-    for (int i = 0; i < history.size(); ++i) {
-
-    }
-    int  sum=0;
-    for(Watchable *c : history)
-    {
-        sum=sum+ c-> getLength() ;
-    }
-    double avgLength=sum/history.size();
-    const std::vector<Watchable*>& content= s.getContent();
-    for(Watchable* show: content){
-        if (show->getLength()==avgLength){
-            bool watched=false;
-            for(Watchable* seen: history){
-                if (seen==show)
-                    watched= true;
+Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
+    Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
+    if(nextEpisode!= nullptr){
+        return nextEpisode;
+    } else {
+        const std::vector<Watchable *> &content = s.getContent();
+        if (content.size() != history.size()) {
+            int sum = 0;
+            for (Watchable *c : history) {
+                sum = sum + c->getLength();
             }
-            if(!watched)
-                return show;
+            double avgLength = sum / history.size();
+            Watchable *tempMin = nullptr;
+            bool watched = false;
+            bool tempIsNull = true;
+            for (int i = 0; i < content.size(); ++i) {
+                if (tempIsNull || abs(avgLength - content.at(i)->getLength()) < abs(avgLength - tempMin->getLength())) {
+                    for (int k = 0; k < history.size() && !watched; ++k) {
+                        if (this->history.at(k) == tempMin)
+                            watched = true;
+                    }
+                    if (!watched) {
+                        tempMin = content.at(i);
+                        tempIsNull = false;
+                    }
+                }
+            }
+            return tempMin;
         }
     }
     return nullptr;
 }
-Watchable* LengthRecommenderUser::getRecommendation(Watchable &w) {}
-Watchable* LengthRecommenderUser::getRecommendation(Movie &s) {}
-Watchable* LengthRecommenderUser::getRecommendation(Episode &s) {}
+
 User* LengthRecommenderUser::duplicateUser(std::string &name) {
     User* newUser=new LengthRecommenderUser(name);
     for(auto& watch: get_history()){
@@ -50,29 +108,33 @@ User* LengthRecommenderUser::duplicateUser(std::string &name) {
     }
     return newUser;
 }
+
 User* LengthRecommenderUser::clone() {
-    User* newUser=new LengthRecommenderUser(getName());
-    return newUser;
+    return new LengthRecommenderUser(*this);
 }
 
-//+++ RerunRecommenderUser +++
-RerunRecommenderUser::RerunRecommenderUser(const std::string &name):User(name), indexOfHistory(0){}
-RerunRecommenderUser::RerunRecommenderUser(const std::string &name, int index): User(name), indexOfHistory(index){}
-Watchable* RerunRecommenderUser::getRecommendation(Session &s) {
-    s.getContent().at((s.getIndexOfContent()+1)%s.getContent().size())->recommendMe(*this);
+void LengthRecommenderUser::buildMe(User *u) const {
+    u=new LengthRecommenderUser(this->getName());
 }
-Watchable* RerunRecommenderUser::getRecommendation(Watchable &w) {
+//userLEN F
+
+
+//userRER S
+
+Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
+    Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
+    if(nextEpisode!= nullptr){
+        return nextEpisode;
+    } else {
+        if (history.size()!=0)
+            return history.at(lastrecommended%history.size());
+        else
+            return nullptr;
+    }
 
 }
-Watchable* RerunRecommenderUser::getRecommendation(Movie &s) {
-    indexOfHistory++;
-    return history.at((indexOfHistory-1)%history.size());
-}
-Watchable* RerunRecommenderUser::getRecommendation(Episode &s) {
-    //if next episode exists then recommend it
-    //else
-    indexOfHistory++;
-    return history.at((indexOfHistory-1)%history.size());
+void RerunRecommenderUser::buildMe(User *u) const {
+    u=new RerunRecommenderUser(this->getName());
 }
 User* RerunRecommenderUser::duplicateUser(std::string &name) {
     User* newUser=new RerunRecommenderUser(name);
@@ -82,23 +144,16 @@ User* RerunRecommenderUser::duplicateUser(std::string &name) {
     return newUser;
 }
 User* RerunRecommenderUser::clone() {
-    User* newUser=new RerunRecommenderUser(getName(),indexOfHistory);
-    return newUser;
+    return new RerunRecommenderUser(*this);
 }
+//userRER F
 
-//GenreRecommenderUser
+
+
+
+//userGEN S
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}
-std::string GenreRecommenderUser::mostPopTag() {
-    std::unordered_map<std::string,int> amountOfTags;
-    for(auto& watch: history){
-        for(auto& tag: watch->getTags()){
-            if(amountOfTags.find(tag)==amountOfTags.end())//this tag not exists
-                amountOfTags[tag]=1;
-            else
-                amountOfTags[tag]++;
-        }
-    }
-
+std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::string,int>& amountOfTags ) const {
     std::string popTag="";
     int amount=0;
     for(auto& tag: amountOfTags)
@@ -120,16 +175,52 @@ std::string GenreRecommenderUser::mostPopTag() {
     }
     return popTag;
 }
-Watchable* GenreRecommenderUser::getRecommendation(Session &s) {
-    std::string popTag=mostPopTag();
-    for(auto& content: s.getContent()){
-        //if this content content this tag and this content doesnt exists
-        //in the history->return this content
+Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
+
+
+    Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
+    if(nextEpisode!= nullptr){
+        return nextEpisode;
+    } else {
+
+
+        //init of TagMap S
+        std::unordered_map<std::string,int> tagMap;
+        for(Watchable* watch: history){
+            for(std::string tag: watch->getTags()){
+                if(tagMap.find(tag)==tagMap.end())//this tag not exists
+                    tagMap[tag]=1;
+                else
+                    tagMap[tag]++;
+            }
+        }
+        //init of TagMap F
+        const std::vector<Watchable *> &content = s.getContent();
+
+        std::string s=mostPopTag(tagMap);//first poptag
+        bool beenWatched= false;
+        while (s.compare("")!=0 ) {
+            for (Watchable *show:content) {
+                for (Watchable *watched:history) {//checks if show been watched
+                    if (watched->getId() == show->getId())
+                        beenWatched = true;
+                }
+                if (!beenWatched) {
+                    for (std::string tag:show->getTags()) {//checks if show has relevant tag
+                        if (s.compare(tag) == 0)
+                            return show;
+                    }
+                }
+            }
+            tagMap.erase(s);
+            s=mostPopTag(tagMap);
+        }
     }
 }
-Watchable* GenreRecommenderUser::getRecommendation(Watchable &w) {}
-Watchable* GenreRecommenderUser::getRecommendation(Movie &s) {}
-Watchable* GenreRecommenderUser::getRecommendation(Episode &s) {}
+
+void GenreRecommenderUser::buildMe(User *u) const {
+    u=new GenreRecommenderUser(this->getName());}
+
 User* GenreRecommenderUser::duplicateUser(std::string &name) {
     User* newUser=new GenreRecommenderUser(name);
     for(auto& watch: get_history()){
@@ -137,7 +228,8 @@ User* GenreRecommenderUser::duplicateUser(std::string &name) {
     }
     return newUser;
 }
+
 User* GenreRecommenderUser::clone() {
-    User* newUser=new GenreRecommenderUser(getName());
-    return newUser;
+    return new GenreRecommenderUser(*this);
 }
+//userGEN F

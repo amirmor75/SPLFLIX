@@ -14,59 +14,76 @@ class Session;
 
 class User{
 public:
-    User(const std::string &name);
-    User(const std::string &name,std::vector<Watchable*> history);
-    virtual Watchable* getRecommendation(Session& s) = 0;
-    virtual Watchable* getRecommendation(Watchable& w)=0;
-    virtual Watchable* getRecommendation(Movie& s) = 0;
-    virtual Watchable* getRecommendation(Episode& s) = 0;
+
+
+    //given
+    User(const std::string& name);
+    virtual Watchable *getRecommendation(Session &s) const = 0;
+    std::string getName() const;
+    std::vector<Watchable*> get_history() const;
+    //given
+    //5 Rule S
+    ~User();
+    User(User& other);
+    User(User&& other);
+    User& operator=(User& other);
+    User& operator=(User&& other);
+    //5 Rule F
+    virtual void buildMe(User* u) const =0;   
+    User(const std::string &name,std::vector<Watchable*> history);    
     std::string getName() const;
     std::vector<Watchable*> get_history() const;
     virtual User* duplicateUser(std::string &name)=0;
     virtual User* clone()=0;
-protected:
+  
+    // all is given
+    protected:
     std::vector<Watchable*> history;
+    int lastrecommended;
 private:
     std::string name;
+    //all is give
 };
 
 
 class LengthRecommenderUser : public User {
 public:
+    //given
     LengthRecommenderUser(const std::string& name);
-    Watchable* getRecommendation(Session& s);
-    Watchable* getRecommendation(Watchable& w);
-    Watchable* getRecommendation(Movie& s);
-    Watchable* getRecommendation(Episode& s);
-    User* duplicateUser(std::string &name);
-    User* clone();
+
+    virtual Watchable *getRecommendation(Session &s) const;
+    //given
+    virtual void buildMe(User* u) const;   
+    virtual User* duplicateUser(std::string &name);
+    virtual User* clone();
 private:
 };
 
 class RerunRecommenderUser : public User {
 public:
+    //given
     RerunRecommenderUser(const std::string& name);
-    RerunRecommenderUser(const std::string& name, int index);
-    Watchable* getRecommendation(Session& s);
-    Watchable* getRecommendation(Watchable& w);
-    Watchable* getRecommendation(Movie& s);
-    Watchable* getRecommendation(Episode& s);
+    virtual Watchable *getRecommendation(Session &s) const ;
+    //given
+    virtual void buildMe(User* u) const ;
+    virtual User* clone();      
     User* duplicateUser(std::string &name);
-    User* clone();
+    
+
 private:
-    int indexOfHistory;
 };
 
 class GenreRecommenderUser : public User {
 public:
+    //given
     GenreRecommenderUser(const std::string& name);
-    Watchable* getRecommendation(Session& s);
-    Watchable* getRecommendation(Watchable& w);
-    Watchable* getRecommendation(Movie& s);
-    Watchable* getRecommendation(Episode& s);
-    User* duplicateUser(std::string &name);
-    User* clone();
-    std::string mostPopTag();
+
+    virtual Watchable *getRecommendation(Session &s) const;
+    //given
+    virtual void buildMe(User* u)const;
+    virtual User* clone();
+    std::string mostPopTag(const std::unordered_map<std::string,int>& tagMap) const;    
+    User* duplicateUser(std::string &name);   
 private:
 };
 

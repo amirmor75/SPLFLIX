@@ -12,17 +12,20 @@ class Watchable;
 class Session{
 public:
     Session(const std::string &configFilePath);
-    //rule of 5
+
+    //5 Rule S
+
     Session(const Session& other);
     Session(Session&& other);
     ~Session();
     Session& operator=(Session& other);
     Session& operator=(Session&& other);
-
+    //5 Rule F
+  
     void start();
     std::vector<std::string>* split(std::string command);
 
-    //getters
+    //getters S
     const std::vector<Watchable*>& getContent();
     Watchable* getContentByID(long id) const;
     const std::vector<BaseAction*>& getActionsLog();
@@ -31,6 +34,7 @@ public:
     std::string& getCurrentCommand();
     const int getIndexOfContent();
     bool getIsRun() const;
+    //getters F
 
     void addToActionsLog(BaseAction* newAction);
     void addToUserMap(std::string name,User* newUserMap);
