@@ -141,7 +141,11 @@ Session::~Session() {
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
 User& Session::getActiveUser() const{ return  *activeUser;}
 const std::vector<Watchable*>& Session::getContent() { return  content;}
-User* Session::getUserFromMap(std::string name) { return  userMap.at(name); }
+User* Session::getUserFromMap(std::string name) {
+    if(isUserExists(name))
+        return  userMap.at(name);
+    return nullptr;
+}
 Watchable* Session::getContentByID(long id) const{
     for(auto& watch: content){
         if(watch->getId()==id)
@@ -173,11 +177,14 @@ bool Session::deleteFromUserMap(std::string name) {
         return true;
     }
 }
-
+bool Session::isUserExists(std::string &name) {
+    if(userMap.find(name)==userMap.end())
+        return false;
+    return true;
+}
 void Session::split(std::string &str, std::vector<std::string> &out) {
     size_t start;
     size_t end = 0;
-    out.clear();
     while ((start = str.find_first_not_of(' ', end)) != std::string::npos)
     {
         end = str.find(' ', start);
@@ -195,8 +202,10 @@ void Session::start() {
     setIsRun(true);
     while(getIsRun()){
         std::getline(std::cin, currentCommand);
-        if(command.size()>0)
-            split(currentCommand,command);
+        if(currentCommand.size()>0) {
+            command.clear();
+            split(currentCommand, command);
+        }
 
         if(command.at(0).compare("createuser")==0) {
             firstSpace = currentCommand.find(" ");

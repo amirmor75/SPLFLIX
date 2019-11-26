@@ -13,12 +13,12 @@ BaseAction::BaseAction(std::string errorMsg, ActionStatus status):errorMsg(error
 std::string BaseAction::getErrorMsgPublic() const { return errorMsg;}
 ActionStatus BaseAction::getStatus() const { return status;}
 void BaseAction::complete() {
-    this->errorMsg="";
     status=COMPLETED;
+    this->errorMsg="";
 }
 void BaseAction::error(const std::string &errorMsg) {
     status=ERROR;
-    this->errorMsg="ERROR <"+errorMsg+">";
+    this->errorMsg=errorMsg;
 }
 std::string BaseAction::getErrorMsg() const { return errorMsg;}
 
@@ -34,16 +34,16 @@ void CreateUser::act(Session &sess) {
         std::string& name =  words.at(0);
         std::string& algorithm=words.at(1);
         User *user;
-        if(sess.getUserFromMap(name)== nullptr) {
-            if (command.compare("gen") == 0) {
+        if(!sess.isUserExists(name)) { //this user doest exist
+            if (algorithm.compare("gen") == 0) {
                 user = new GenreRecommenderUser(name);
                 sess.addToUserMap(name, user);
                 complete();
-            } else if (command.compare("len") == 0) {
+            } else if (algorithm.compare("len") == 0) {
                 user = new LengthRecommenderUser(name);
                 sess.addToUserMap(name, user);
                 complete();
-            } else if (command.compare("rer") == 0) {
+            } else if (algorithm.compare("rer") == 0) {
                 user = new RerunRecommenderUser(name);
                 sess.addToUserMap(name, user);
                 complete();
@@ -54,8 +54,9 @@ void CreateUser::act(Session &sess) {
         } else {
             error("This name is already exists");
         }
-    } else
+    } else {
         error("invalid input");
+    }
 }
 std::string CreateUser::toString() const { return "CreateUser"; }
 BaseAction* CreateUser::clone() {
@@ -194,7 +195,6 @@ void Watch::act(Session &sess) {
     if(words.size()==1) {
         std::string &idStr = words.at(0);
         Watchable* watch=sess.getContentByID(stoi(idStr));
-        std::cout<<watch->toString();
         if (watch!= nullptr) {
             sess.getActiveUser().addToHistory(watch);
             std::string name="Watching "+watch->toString();
@@ -230,12 +230,15 @@ void PrintActionsLog::act(Session &sess) {
     for(auto& action: sess.getActionsLog()) {
         str=action->toString()+" ";
         switch (action->getStatus()){
-            case ERROR:
-                status="ERROR";
-            case PENDING:
-                status="PENDING";
             case COMPLETED:
                 status="COMPLETED";
+                break;
+            case PENDING:
+                status="PENDING";
+                break;
+            case ERROR:
+                status="ERROR";
+                break;
         }
         if(status.compare("ERROR")==0)
             error=" "+action->getErrorMsgPublic();
