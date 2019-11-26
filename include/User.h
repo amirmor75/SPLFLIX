@@ -15,11 +15,10 @@ public:
 
     //given
     User(const std::string& name);
-    virtual Watchable* getRecommendation(Session& s) = 0;
+    virtual Watchable *getRecommendation(Session &s) const = 0;
     std::string getName() const;
     std::vector<Watchable*> get_history() const;
     //given
-
     //5 Rule S
     ~User();
     User(const User& other);
@@ -27,18 +26,13 @@ public:
     User& operator=(User& other);
     User& operator=(User&& other);
     //5 Rule F
-
-   //visitor
-    virtual Watchable* getRecommendation(Watchable& w)=0;
-    virtual Watchable* getRecommendation(Movie& s) = 0;
-    virtual Watchable* getRecommendation(Episode& s) = 0;
-    //visitor
+    virtual void buildMe(User* u) const =0;
     virtual User* clone()=0;
-
     // all is given
     protected:
     std::vector<Watchable*> history;
-    private:
+    int lastrecommended;
+private:
     std::string name;
     //all is given
 };
@@ -48,14 +42,9 @@ class LengthRecommenderUser : public User {
 public:
     //given
     LengthRecommenderUser(const std::string& name);
-    virtual Watchable* getRecommendation(Session& s);
+    virtual Watchable *getRecommendation(Session &s) const;
     //given
-
-    //visitor
-    virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s); //for double dispatch
-    virtual Watchable* getRecommendation(Episode& s);
-    //visitor
+    virtual void buildMe(User* u) const;
     User* clone();
 private:
 };
@@ -64,31 +53,24 @@ class RerunRecommenderUser : public User {
 public:
     //given
     RerunRecommenderUser(const std::string& name);
-    virtual Watchable* getRecommendation(Session& s);
+    virtual Watchable *getRecommendation(Session &s) const ;
     //given
+    virtual void buildMe(User* u) const ;
 
     RerunRecommenderUser(const std::string& name, int index);
-    virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s); //for double dispatch
-    virtual Watchable* getRecommendation(Episode& s);
-    User* clone();
+
+    virtual User* clone();
 private:
-    int indexOfHistory;
 };
 
 class GenreRecommenderUser : public User {
 public:
     //given
     GenreRecommenderUser(const std::string& name);
-    virtual Watchable* getRecommendation(Session& s);
+    virtual Watchable *getRecommendation(Session &s) const;
     //given
-    GenreRecommenderUser(const std::string& name, std::unordered_map<std::string,int> tags);
-    //visitor
-    virtual Watchable* getRecommendation(Watchable& w);
-    virtual Watchable* getRecommendation(Movie& s); //we need to implement double dispatch
-    virtual Watchable* getRecommendation(Episode& s);
-    //visitor
-    User* clone()=0;
+    virtual void buildMe(User* u)const;
+    virtual User* clone();
     std::string mostPopTag();
 private:
 };

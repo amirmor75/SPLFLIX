@@ -11,24 +11,24 @@
 
 
 //User S
-User::User(const std::string &name): name(name)
-{}
+User::User(const std::string &name): name(name),history(){}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
-LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
-User* User::clone() {}
-
 //5 Rule S
 User::~User() {
     for (Watchable* w:history) {
         delete w;
     }
 }
-User::User(const User &other): name(other.name) {
-    for (int i = 0; i <history.size(); ++i)
+User::User(const User &other){
+    other.buildMe(this);
+    for (int i = 0; i < other.history.size(); ++i) {
         this->history[i]=other.history[i]->clone();
+    }
 }
-User::User(User &&other):name(other.getName()),history(other.get_history()) {
+User::User(User &&other){
+    other.buildMe(this);
+    this->history=other.history;
     other.name= nullptr;
     other.history.clear();
 }
@@ -57,65 +57,82 @@ User& User::operator=(User &&other) {
             w= nullptr;
         other.history.clear();
     }
-
     return *this;
 }
-
 //5 Rule F
-
 //User F
 
-Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
-    for (int i = 0; i < history.size(); ++i) {
-
-    }
-    int  sum=0;
-    for(Watchable *c : history)
-    {
-        sum=sum+ c-> getLength() ;
-    }
-    double avgLength=sum/history.size();
-    const std::vector<Watchable*>& content= s.getContent();
-    for(Watchable* show: content){
-        if (show->getLength()==avgLength){
-            bool watched=false;
-            for(Watchable* seen: history){
-                if (seen==show)
-                    watched= true;
+//userLEN S
+LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
+Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
+    Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
+    if(nextEpisode!= nullptr){
+        return nextEpisode;
+    } else {
+        const std::vector<Watchable *> &content = s.getContent();
+        if (content.size() != history.size()) {
+            int sum = 0;
+            for (Watchable *c : history) {
+                sum = sum + c->getLength();
             }
-            if(!watched)
-                return show;
+            double avgLength = sum / history.size();
+            Watchable *tempMin = nullptr;
+            bool watched = false;
+            bool tempIsNull = true;
+            for (int i = 0; i < content.size(); ++i) {
+                if (tempIsNull || abs(avgLength - content.at(i)->getLength()) < abs(avgLength - tempMin->getLength())) {
+                    for (int k = 0; k < history.size() && !watched; ++k) {
+                        if (this->history.at(k) == tempMin)
+                            watched = true;
+                    }
+                    if (!watched) {
+                        tempMin = content.at(i);
+                        tempIsNull = false;
+                    }
+                }
+            }
+            return tempMin;
         }
     }
     return nullptr;
 }
-User* LengthRecommenderUser::clone() {
-    User* newUser=new LengthRecommenderUser(getName());
-    return newUser;
-}
 
-//RerunRecommenderUser
-RerunRecommenderUser::RerunRecommenderUser(const std::string &name):User(name), indexOfHistory(0){}
-RerunRecommenderUser::RerunRecommenderUser(const std::string &name, int index): User(name), indexOfHistory(index){}
-Watchable* RerunRecommenderUser::getRecommendation(Session &s) {
-    s.getContent().at((s.getIndexOfContent()+1)%s.getContent().size())->recommendMe(*this);
+User* LengthRecommenderUser::clone() {
+    return new LengthRecommenderUser(*this);
 }
-Watchable* RerunRecommenderUser::getRecommendation(Movie &s) {
-    indexOfHistory++;
-    return history.at((indexOfHistory-1)%history.size());
+void LengthRecommenderUser::buildMe(User *u) const {
+    u=new LengthRecommenderUser(this->getName());
 }
-Watchable* RerunRecommenderUser::getRecommendation(Episode &s) {
-    //if next episode exists then recommend it
-    //else
-    indexOfHistory++;
-    return history.at((indexOfHistory-1)%history.size());
+//userLEN F
+
+
+//userRER S
+RerunRecommenderUser::
+Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
+    Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
+    if(nextEpisode!= nullptr){
+        return nextEpisode;
+    } else {
+        if (history.size()!=0)
+            return history.at(lastrecommended%history.size());
+        else
+            return nullptr;
+    }
+
+
+}
+void RerunRecommenderUser::buildMe(User *u) const {
+    u=new RerunRecommenderUser(this->getName());
 }
 User* RerunRecommenderUser::clone() {
-    User* newUser=new RerunRecommenderUser(getName(),indexOfHistory);
-    return newUser;
+    return new RerunRecommenderUser(*this);
 }
+//userRER F
 
-//GenreRecommenderUser
+
+
+
+//userGEN S
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}
 std::string GenreRecommenderUser::mostPopTag() {
     std::unordered_map<std::string,int> amountOfTags;
@@ -149,14 +166,11 @@ std::string GenreRecommenderUser::mostPopTag() {
     }
     return popTag;
 }
-Watchable* GenreRecommenderUser::getRecommendation(Session &s) {
-    std::string popTag=mostPopTag();
-    for(auto& content: s.getContent()){
-        //if this content content this tag and this content doesnt exists
-        //in the history->return this content
-    }
+
+void GenreRecommenderUser::buildMe(User *u) const {
+    u=new GenreRecommenderUser(this->getName());
 }
 User* GenreRecommenderUser::clone() {
-    User* newUser=new GenreRecommenderUser(getName());
-    return newUser;
+    return new GenreRecommenderUser(*this);
 }
+//userGEN F
