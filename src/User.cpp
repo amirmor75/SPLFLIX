@@ -10,10 +10,14 @@
 
 
 
+
 //User S
 User::User(const std::string &name): name(name),history(),lastrecommended(0){}
 std::string User::getName() const { return name;}
 std::vector<Watchable*> User::get_history() const {return history;}
+// contriversal
+User* User::clone() {}
+// contriversal  
 //5 Rule S
 User::~User() {
     for (Watchable* w:history) {
@@ -97,9 +101,18 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
     return nullptr;
 }
 
+User* LengthRecommenderUser::duplicateUser(std::string &name) {
+    User* newUser=new LengthRecommenderUser(name);
+    for(auto& watch: get_history()){
+        newUser->get_history().push_back(watch->clone());
+    }
+    return newUser;
+}
+
 User* LengthRecommenderUser::clone() {
     return new LengthRecommenderUser(*this);
 }
+
 void LengthRecommenderUser::buildMe(User *u) const {
     u=new LengthRecommenderUser(this->getName());
 }
@@ -122,6 +135,13 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
 }
 void RerunRecommenderUser::buildMe(User *u) const {
     u=new RerunRecommenderUser(this->getName());
+}
+User* RerunRecommenderUser::duplicateUser(std::string &name) {
+    User* newUser=new RerunRecommenderUser(name);
+    for(auto& watch: get_history()){
+        newUser->get_history().push_back(watch->clone());
+    }
+    return newUser;
 }
 User* RerunRecommenderUser::clone() {
     return new RerunRecommenderUser(*this);
@@ -197,9 +217,18 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
         }
     }
 }
+
 void GenreRecommenderUser::buildMe(User *u) const {
-    u=new GenreRecommenderUser(this->getName());
+    u=new GenreRecommenderUser(this->getName());}
+
+User* GenreRecommenderUser::duplicateUser(std::string &name) {
+    User* newUser=new GenreRecommenderUser(name);
+    for(auto& watch: get_history()){
+        newUser->get_history().push_back(watch->clone());
+    }
+    return newUser;
 }
+
 User* GenreRecommenderUser::clone() {
     return new GenreRecommenderUser(*this);
 }
