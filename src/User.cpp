@@ -10,31 +10,31 @@
 
 //User S
 User::User(const std::string &name): name(name),history(),lastrecommended(0){}
-User::User(const std::string &name, std::vector<Watchable *> history) {
-
+User::User(std::vector<Watchable *> &hist, int lastRec, std::string &newName):lastrecommended(lastRec), name(newName) {
+    for(auto& watch: hist)
+        history.push_back(watch->clone());
 }
 std::vector<Watchable*> User::get_history() const {return history;}
 //5 Rule S
 User::~User() {
-
     for(Watchable* w:history){
         delete w;
     }
     history.clear();
     name= nullptr;
 }
-User::User(User &other):name(other.name), lastrecommended(other.lastrecommended){
-    for(Watchable* w: other.get_history())
-        this->history.push_back(w->clone());
+User::User(User &other){
+    if(this != &other) {
+        name=other.name;
+        lastrecommended=other.lastrecommended;
+        for (Watchable *w: other.get_history())
+            this->history.push_back(w->clone());
+    }
 }
-User::User(User &&other){
-    name=other.name;
-    other.name= nullptr;
-
-    lastrecommended=other.lastrecommended;
-    other.lastrecommended=0;
-
-    this->history=other.history;
+User::User(User &&other): name(other.name), lastrecommended(other.lastrecommended), history(other.history){
+    for(int i=0;i<other.history.size();i++){
+        other.history.at(i)= nullptr;
+    }
     other.history.clear();
 }
 User& User::operator=(User &other) {
@@ -73,12 +73,14 @@ User& User::operator=(User &&other) {
 void User::setName(std::string &newName) {
     name=newName;
 }
+std::string& User::getName() { return name;}
 void User::addToHistory(Watchable *watch) { history.push_back(watch); }
 
 //User F
 
 //userLEN S
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
+LengthRecommenderUser::LengthRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name) {}
 Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
     if(nextEpisode!= nullptr){
@@ -113,13 +115,13 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
 }
 
 User* LengthRecommenderUser::clone() {
-    return new LengthRecommenderUser(*this);
+    return new LengthRecommenderUser(history,lastrecommended,getName());
 }
 //userLEN F
 
 
 //userRER S
-
+RerunRecommenderUser::RerunRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name)  {}
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name): User(name){}
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
@@ -134,7 +136,7 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
 
 }
 User* RerunRecommenderUser::clone() {
-    return new RerunRecommenderUser(*this);
+    return new RerunRecommenderUser(history,lastrecommended,getName());
 }
 //userRER F
 
@@ -142,6 +144,7 @@ User* RerunRecommenderUser::clone() {
 
 
 //userGEN S
+GenreRecommenderUser::GenreRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name)  {}
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}
 std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::string,int>& amountOfTags ) const {
     std::string popTag="";
@@ -207,6 +210,6 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
 }
 
 User* GenreRecommenderUser::clone() {
-    return new GenreRecommenderUser(*this);
+    return new GenreRecommenderUser(history,lastrecommended,getName());
 }
 //userGEN F

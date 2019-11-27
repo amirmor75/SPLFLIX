@@ -100,7 +100,6 @@ Session& Session::operator=(Session& other) {
 }
 
 Session& Session::operator=(Session &&other) {
-    if(this!=&other){
         indexOfContent=other.indexOfContent;
         currentCommand=other.currentCommand;
         indexOfContent=other.indexOfContent;
@@ -121,7 +120,6 @@ Session& Session::operator=(Session &&other) {
             delete x.second;
         }
         userMap=other.userMap; //shallow copy
-    }
     return (*this);
 }
 

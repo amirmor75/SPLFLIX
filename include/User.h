@@ -15,7 +15,7 @@ class Session;
 class User{
 public:
 
-
+    User(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     User(const std::string& name);
     virtual Watchable *getRecommendation(Session &s) const = 0;
@@ -28,10 +28,11 @@ public:
     User& operator=(User& other);
     User& operator=(User&& other);
     //5 Rule F
-    User(const std::string &name,std::vector<Watchable*> history);
     virtual User* clone()=0;
     void addToHistory(Watchable* watch);
     void setName(std::string & name);
+    std::string& getName();
+
 
     // all is given
     protected:
@@ -45,6 +46,7 @@ private:
 
 class LengthRecommenderUser : public User {
 public:
+    LengthRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     LengthRecommenderUser(const std::string& name);
     virtual Watchable *getRecommendation(Session &s) const;
@@ -56,6 +58,7 @@ private:
 
 class RerunRecommenderUser : public User {
 public:
+    RerunRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     RerunRecommenderUser(const std::string& name);
     virtual Watchable *getRecommendation(Session &s) const ;
@@ -68,6 +71,7 @@ private:
 
 class GenreRecommenderUser : public User {
 public:
+    GenreRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     GenreRecommenderUser(const std::string& name);
     virtual Watchable *getRecommendation(Session &s) const;

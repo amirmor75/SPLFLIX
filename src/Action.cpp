@@ -3,6 +3,7 @@
 //
 
 #include <Action.h>
+#include <algorithm>
 #include "Session.h"
 #include "User.h"
 
@@ -21,6 +22,10 @@ void BaseAction::error(const std::string &errorMsg) {
     this->errorMsg=errorMsg;
 }
 std::string BaseAction::getErrorMsg() const { return errorMsg;}
+bool BaseAction::isNumber(const std::string &s){
+    return !s.empty() && std::find_if(s.begin(),
+               s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
 
 
 //+++ CreateUser +++
@@ -79,7 +84,7 @@ void ChangeActiveUser::act(Session &sess) {
             complete();
         }
         else
-            error("user "+name+" has never been created");
+            error("user "+name+" is not exists");
     }
     else
         error("invalid input");
@@ -106,7 +111,7 @@ void DeleteUser::act(Session &sess) {
     } else
         error("invalid input");
 }
-std::string DeleteUser::toString() const { return "Delete User"; }
+std::string DeleteUser::toString() const { return "DeleteUser"; }
 BaseAction* DeleteUser::clone() {
     BaseAction* del=new DeleteUser(getErrorMsg(),getStatus());
     return del;
@@ -170,11 +175,8 @@ PrintWatchHistory::PrintWatchHistory() :BaseAction(){}
 PrintWatchHistory::PrintWatchHistory(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void PrintWatchHistory::act(Session &sess) {
     int index=1;
-    std::string str="";
     for(auto& watch: sess.getActiveUser().get_history()) {
-        str=index+". ";
-        str+=watch->toString();
-        std::cout << str << '\n';
+        printf("%d. %s \n",index,watch->toString().c_str());
         index++;
     }
     complete();
@@ -194,23 +196,29 @@ void Watch::act(Session &sess) {
     sess.split(sess.getCurrentCommand(),words);
     if(words.size()==1) {
         std::string &idStr = words.at(0);
-        Watchable* watch=sess.getContentByID(stoi(idStr));
-        if (watch!= nullptr) {
-            sess.getActiveUser().addToHistory(watch);
-            std::string name="Watching "+watch->toString();
-            std::cout<<name<<'\n';
-            Watchable* nextWatch=sess.getActiveUser().getRecommendation(sess);
-            name="We recommend watching "+nextWatch->toString()+", continue watching? [y/n]";
-            char answer;
-            std::cin >> answer;
-            if(answer=='y'){
-                name=nextWatch->getId()+"";
-                sess.setCurrentCommand(name);
-                act(sess);
+        if(isNumber(idStr)) {
+            Watchable *watch = sess.getContentByID(stoi(idStr));
+            if (watch != nullptr) {
+                sess.getActiveUser().addToHistory(watch->clone());
+                std::string name = "Watching " + watch->toString();
+                std::cout << name << '\n';
+                Watchable *nextWatch = sess.getActiveUser().getRecommendation(sess);
+                name = "We recommend watching " + nextWatch->toString() + ", continue watching? [y/n]";
+                std::cout << name << '\n';
+                char answer;
+                std::cin >> answer;
+                if (answer == 'y') {
+                    name = std::to_string(nextWatch->getId());
+                    sess.setCurrentCommand(name);
+                    act(sess);
+                }
+                complete();
+            } else {
+                error(idStr + " is out of content bounds");
             }
-            complete();
-        } else {
-            error(idStr + " is out of content bounds");
+        }
+        else{
+            error(idStr + " is not an integer");
         }
     } else
         error("invalid input");
@@ -241,7 +249,9 @@ void PrintActionsLog::act(Session &sess) {
                 break;
         }
         if(status.compare("ERROR")==0)
-            error=" "+action->getErrorMsgPublic();
+            error = " " + action->getErrorMsgPublic();
+        else
+            error="";
         str+=status+error;
         std::cout << str << '\n';
     }
