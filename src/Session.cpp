@@ -12,17 +12,15 @@
 //Session Constructor
 Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand(""), isRunning(false) {
     using json= nlohmann::json;
-    std::ifstream file(configFilePath);
     json j;
+    std::ifstream file(configFilePath);
     file >> j;
 
-    json movies;
-    movies=j["movies"];
+    json movies=j["movies"];
     for (auto& element : movies){
         content.push_back(new Movie(content.size(),element["name"],element["length"],element["tags"]));
     }
-    json series;
-    series=j["tv_series"];
+    json series=j["tv_series"];
     int seasonIndex;
     for(auto& element : series) {
         seasonIndex = 1;

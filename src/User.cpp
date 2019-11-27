@@ -169,7 +169,6 @@ std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::stri
     return popTag;
 }
 Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
-
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
     if(nextEpisode!= nullptr){
         return nextEpisode;
@@ -206,9 +205,7 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
             s=mostPopTag(tagMap);
         }
     }
-    std::vector<std::string> a;
-    a.push_back("asd");
-    return new Movie(20,"asd",55,a); //it supposed to return somethingggggggg
+    return nullptr;
 }
 
 User* GenreRecommenderUser::clone() {

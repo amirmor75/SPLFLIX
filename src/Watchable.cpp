@@ -30,7 +30,8 @@ Watchable* Movie::clone() {
 //Movie F
 
 //Episode S
-Episode::Episode(long id, int length, const std::string &seriesName, int season, int episode,const std::vector<std::string> &tags):Watchable(id,length,tags),seriesName(seriesName),season(season),episode(episode),nextEpisodeId(id+1){}
+Episode::Episode(long id, int length, const std::string &seriesName, int season, int episode,
+                 const std::vector<std::string> &tags):Watchable(id,length,tags),seriesName(seriesName),season(season),episode(episode),nextEpisodeId(id+1) {}
 Episode::Episode(Episode &other):Watchable(other.getId(),other.getLength(),other.getTags()),seriesName(other.getSeriesName()),season(other.getSeason()),episode(other.getEpisode()), nextEpisodeId(other.nextEpisodeId){}
 Watchable* Episode::getNextWatchable(Session &s) const {
     const std::vector<Watchable*>& content=s.getContent();
