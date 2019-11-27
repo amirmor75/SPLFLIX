@@ -20,6 +20,8 @@ public:
 	virtual std::string toString() const=0;
 	std::string getErrorMsgPublic() const;
 	virtual BaseAction* clone()=0;
+	bool isNumber(const std::string& s);
+
 
 protected:
 	void complete();
