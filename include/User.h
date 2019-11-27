@@ -22,7 +22,7 @@ public:
     std::vector<Watchable*> get_history() const;
     //given
     //5 Rule S
-    ~User();
+    virtual ~User();
     User(User& other);
     User(User&& other);
     User& operator=(User& other);
@@ -46,6 +46,7 @@ private:
 
 class LengthRecommenderUser : public User {
 public:
+    virtual ~LengthRecommenderUser();
     LengthRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     LengthRecommenderUser(const std::string& name);
@@ -58,6 +59,7 @@ private:
 
 class RerunRecommenderUser : public User {
 public:
+    virtual ~RerunRecommenderUser();
     RerunRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     RerunRecommenderUser(const std::string& name);
@@ -71,6 +73,7 @@ private:
 
 class GenreRecommenderUser : public User {
 public:
+    virtual ~GenreRecommenderUser();
     GenreRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     GenreRecommenderUser(const std::string& name);

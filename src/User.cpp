@@ -2,11 +2,10 @@
 // Created by amir on 19/11/2019.
 //
 
-#include <User.h>
+#include "../include/User.h"
 #include <string>
 #include <cstring>
-#include "Watchable.h"
-#include "Session.h"
+#include "../include/Session.h"
 
 //User S
 User::User(const std::string &name): name(name),history(),lastrecommended(0){}
@@ -20,8 +19,6 @@ User::~User() {
     for(Watchable* w:history){
         delete w;
     }
-    history.clear();
-    name= nullptr;
 }
 User::User(User &other){
     if(this != &other) {
@@ -79,6 +76,7 @@ void User::addToHistory(Watchable *watch) { history.push_back(watch); }
 //User F
 
 //userLEN S
+LengthRecommenderUser::~LengthRecommenderUser() { }
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
 LengthRecommenderUser::LengthRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name) {}
 Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
@@ -121,6 +119,7 @@ User* LengthRecommenderUser::clone() {
 
 
 //userRER S
+RerunRecommenderUser::~RerunRecommenderUser() { }
 RerunRecommenderUser::RerunRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name)  {}
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name): User(name){}
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
@@ -144,6 +143,7 @@ User* RerunRecommenderUser::clone() {
 
 
 //userGEN S
+GenreRecommenderUser::~GenreRecommenderUser() { }
 GenreRecommenderUser::GenreRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name)  {}
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}
 std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::string,int>& amountOfTags ) const {
@@ -169,7 +169,6 @@ std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::stri
     return popTag;
 }
 Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
-
 
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
     if(nextEpisode!= nullptr){
@@ -207,6 +206,9 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
             s=mostPopTag(tagMap);
         }
     }
+    std::vector<std::string> a;
+    a.push_back("asd");
+    return new Movie(20,"asd",55,a); //it supposed to return somethingggggggg
 }
 
 User* GenreRecommenderUser::clone() {

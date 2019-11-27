@@ -2,13 +2,13 @@
 // Created by tal on 19/11/2019.
 //
 
-#include "Session.h"
-#include <../include/json.hpp>
+#include "../include/Session.h"
+#include "../include/json.hpp"
 #include <fstream>
-#include <Watchable.h>
-#include <User.h>
+#include "../include/Watchable.h"
 #include <iostream>
 
+//Session Constructor
 //Session Constructor
 Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand(""), isRunning(false) {
     using json= nlohmann::json;
@@ -28,24 +28,23 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
         seasonIndex = 1;
         for (int season: element["seasons"]) {
             for (int i = 1; i <= season; i++) {
-                content.push_back(new Episode(content.size(), element["name"], element["episode_length"],seasonIndex,i, element["tags"]));
+                content.push_back(new Episode(content.size(), element["episode_length"], element["name"],seasonIndex,i, element["tags"]));
             }
             seasonIndex++;
         }
     }
 }
 
-
 //5 Rule S
 //Session copy constructor
-Session::Session(const Session &other): isRunning(other.isRunning), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent){
+Session::Session(const Session &other): isRunning(other.isRunning), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent),content(),actionsLog(),userMap(),activeUser() {
     activeUser=other.activeUser->clone();
-    for(int i=0;i<other.content.size();i++){
-        content.push_back(other.content.at(i)->clone());
-    }
-    for(int i=0;i<other.actionsLog.size();i++){
-        actionsLog.push_back(other.actionsLog.at(i)->clone());
-    }
+    for(Watchable* watch: other.content)
+        content.push_back(watch->clone());
+
+    for(BaseAction* action: other.actionsLog)
+        actionsLog.push_back(action->clone());
+
     for (auto& x: other.userMap) {
         userMap.insert({x.first,x.second->clone()});
     }
@@ -54,12 +53,10 @@ Session::Session(const Session &other): isRunning(other.isRunning), currentComma
 Session::Session(Session&& other):
 activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), indexOfContent(other.indexOfContent), currentCommand(other.currentCommand), isRunning(other.isRunning) {
     other.activeUser= nullptr;
-    for(int i=0;i<other.content.size();i++){
-        other.content.at(i)= nullptr;
-    }
-    for(int i=0;i<other.actionsLog.size();i++){
-        other.actionsLog.at(i)= nullptr;
-    }
+    for(Watchable* watch:other.content)
+        watch= nullptr;
+    for(BaseAction* base:other.actionsLog)
+        base= nullptr;
     for (auto& x: other.userMap) {
         x.second= nullptr;
     }
@@ -72,21 +69,17 @@ Session& Session::operator=(Session& other) {
         indexOfContent=other.indexOfContent;
         delete activeUser;
         activeUser=other.activeUser->clone();
-        for(int i=0;i<content.size();i++){
-            delete content.at(i);
-        }
+        for(Watchable* watch: content)
+            delete watch;
         content.clear();
-        for(int i=0;i<other.content.size();i++){
-            content.push_back(other.content.at(i)->clone());
-        }
+        for(Watchable* watch:other.content)
+            content.push_back(watch->clone());
 
-        for(int i=0;i<actionsLog.size();i++){
-            delete actionsLog.at(i);
-        }
+        for(BaseAction* base:actionsLog)
+            delete base;
         actionsLog.clear();
-        for(int i=0;i<other.actionsLog.size();i++){
-            actionsLog.push_back(other.actionsLog.at(i)->clone());
-        }
+        for(BaseAction* base:other.actionsLog)
+            actionsLog.push_back(base->clone());
 
         for (auto& x: userMap) {
             delete x.second;
@@ -106,14 +99,12 @@ Session& Session::operator=(Session &&other) {
         delete activeUser;
         activeUser=other.activeUser;
 
-        for(int i=0;i<content.size();i++){
-            delete content.at(i);
-        }
+        for(Watchable* watch: content)
+            delete watch;
         content=other.content; //shallow copy
 
-        for(int i=0;i<actionsLog.size();i++){
-            delete actionsLog.at(i);
-        }
+        for(BaseAction* base:actionsLog)
+            delete base;
         actionsLog=other.actionsLog; //shallow copy
 
         for (auto& x: userMap) {
@@ -124,12 +115,10 @@ Session& Session::operator=(Session &&other) {
 }
 
 Session::~Session() {
-    for(int i=0;i<content.size();i++){
-        delete content[i];
-    }
-    for(int i=0;i<actionsLog.size();i++){
-        delete actionsLog[i];
-    }
+    for(Watchable* watch: content)
+        delete watch;
+    for(BaseAction* base: actionsLog)
+        delete base;
     for (auto& x: userMap) {
         delete x.second;
     }
@@ -165,7 +154,7 @@ std::string& Session::getCurrentCommand() { return currentCommand;}
 void Session::setCurrentCommand(std::string& currentCommand) {this->currentCommand=currentCommand;}
 const int Session::getIndexOfContent() { return indexOfContent; }
 bool Session::getIsRun() const { return isRunning; }
-bool Session::setIsRun(bool run) { isRunning=run; }
+void Session::setIsRun(bool run) { isRunning=run; }
 
 bool Session::deleteFromUserMap(std::string name) {
     if(userMap.find(name)==userMap.end())
@@ -216,7 +205,7 @@ void Session::start() {
         }
         else if(command.at(0).compare("changeuser")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace < currentCommand.size()) {
+            if (firstSpace < (signed)currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new ChangeActiveUser();
                 baseAction->act(*this);
@@ -225,7 +214,7 @@ void Session::start() {
         }
         else if(command.at(0).compare("deleteuser")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace < currentCommand.size()) {
+            if (firstSpace < (signed)currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new DeleteUser();
                 baseAction->act(*this);
@@ -234,7 +223,7 @@ void Session::start() {
         }
         else if(command.at(0).compare("dupuser")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace < currentCommand.size()) {
+            if (firstSpace < (signed)currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new DuplicateUser();
                 baseAction->act(*this);
@@ -253,7 +242,7 @@ void Session::start() {
         }
         else if(command.at(0).compare("watch")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace <= currentCommand.size()) {
+            if (firstSpace <= (signed)currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new Watch();
                 baseAction->act(*this);

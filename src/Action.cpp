@@ -2,10 +2,10 @@
 // Created by amir on 19/11/2019.
 //
 
-#include <Action.h>
+#include "../include/Action.h"
 #include <algorithm>
-#include "Session.h"
-#include "User.h"
+#include "../include/Session.h"
+#include "../include/User.h"
 
 
 //+++ BaseAction +++
@@ -29,6 +29,7 @@ bool BaseAction::isNumber(const std::string &s){
 
 
 //+++ CreateUser +++
+CreateUser::~CreateUser() { }
 CreateUser::CreateUser() :BaseAction(){}
 CreateUser::CreateUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void CreateUser::act(Session &sess) {
@@ -70,15 +71,15 @@ BaseAction* CreateUser::clone() {
 }
 
 //+++ ChangeActiveUser +++
+ChangeActiveUser::~ChangeActiveUser() { }
 ChangeActiveUser::ChangeActiveUser() :BaseAction(){}
 ChangeActiveUser::ChangeActiveUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void ChangeActiveUser::act(Session &sess) {
     std::vector<std::string> words;
     sess.split(sess.getCurrentCommand(),words);
     if(words.size()==1) {
-        std::string& command=sess.getCurrentCommand();
         std::string& name =  words.at(0);
-        User *user = sess.getUserFromMap(name);
+        User *user = sess.getUserFromMap(name)->clone();
         if(user!=nullptr){
             sess.setActiveUser(user);
             complete();
@@ -96,6 +97,7 @@ BaseAction* ChangeActiveUser::clone() {
 }
 
 //+++ DeleteUser +++
+DeleteUser::~DeleteUser() { }
 DeleteUser::DeleteUser() :BaseAction(){}
 DeleteUser::DeleteUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DeleteUser::act(Session &sess) {
@@ -118,6 +120,7 @@ BaseAction* DeleteUser::clone() {
 }
 
 //+++ DuplicateUser +++
+DuplicateUser::~DuplicateUser() { }
 DuplicateUser::DuplicateUser() :BaseAction(){}
 DuplicateUser::DuplicateUser(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void DuplicateUser::act(Session &sess) {
@@ -152,6 +155,7 @@ BaseAction* DuplicateUser::clone() {
 
 
 //+++ PrintContentList +++
+PrintContentList::~PrintContentList() { }
 PrintContentList::PrintContentList() :BaseAction(){}
 PrintContentList::PrintContentList(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void PrintContentList::act(Session &sess) {
@@ -171,6 +175,7 @@ BaseAction* PrintContentList::clone() {
 
 
 //+++ PrintWatchHistory +++
+PrintWatchHistory::~PrintWatchHistory() { }
 PrintWatchHistory::PrintWatchHistory() :BaseAction(){}
 PrintWatchHistory::PrintWatchHistory(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void PrintWatchHistory::act(Session &sess) {
@@ -189,6 +194,7 @@ BaseAction* PrintWatchHistory::clone() {
 
 
 //+++ Watch +++
+Watch::~Watch() { }
 Watch::Watch() :BaseAction(){}
 Watch::Watch(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void Watch::act(Session &sess) {
@@ -231,6 +237,7 @@ BaseAction* Watch::clone() {
 
 
 //+++ PrintActionsLog +++
+PrintActionsLog::~PrintActionsLog() { }
 PrintActionsLog::PrintActionsLog() :BaseAction(){}
 PrintActionsLog::PrintActionsLog(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void PrintActionsLog::act(Session &sess) {
@@ -265,6 +272,7 @@ BaseAction* PrintActionsLog::clone() {
 
 
 //+++ Exit +++
+Exit::~Exit() { }
 Exit::Exit() :BaseAction(){}
 Exit::Exit(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void Exit::act(Session &sess) {

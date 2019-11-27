@@ -2,8 +2,8 @@
 // Created by amir on 19/11/2019.
 //
 
-#include "Watchable.h"
-#include "Session.h"
+#include "../include/Watchable.h"
+#include "../include/Session.h"
 #include <utility>
 class Session;
 
@@ -30,8 +30,8 @@ Watchable* Movie::clone() {
 //Movie F
 
 //Episode S
-Episode::Episode(long id, const std::string &seriesName, int length, int season, int episode,const std::vector<std::string> &tags):Watchable(id,length,tags),season(season),episode(episode),seriesName(seriesName),nextEpisodeId(id+1){}
-Episode::Episode(Episode &other):Watchable(other.getId(),other.getLength(),other.getTags()),season(other.getSeason()),episode(other.getEpisode()),seriesName(other.getSeriesName()){}
+Episode::Episode(long id, int length, const std::string &seriesName, int season, int episode,const std::vector<std::string> &tags):Watchable(id,length,tags),seriesName(seriesName),season(season),episode(episode),nextEpisodeId(id+1){}
+Episode::Episode(Episode &other):Watchable(other.getId(),other.getLength(),other.getTags()),seriesName(other.getSeriesName()),season(other.getSeason()),episode(other.getEpisode()), nextEpisodeId(other.nextEpisodeId){}
 Watchable* Episode::getNextWatchable(Session &s) const {
     const std::vector<Watchable*>& content=s.getContent();
     if(content.at(nextEpisodeId)->isEpisode())

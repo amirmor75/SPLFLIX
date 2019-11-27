@@ -44,7 +44,7 @@ public:
     //setters
     void setActiveUser(User* user);
     void setCurrentCommand(std::string& currentCommand);
-    bool setIsRun(bool run);
+    void setIsRun(bool run);
 
 private:
     std::vector<Watchable*> content;

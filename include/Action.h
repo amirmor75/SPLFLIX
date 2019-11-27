@@ -15,6 +15,7 @@ class BaseAction{
 public:
 	BaseAction();
     BaseAction(std::string errorMsg,ActionStatus status);
+    virtual ~BaseAction()= default;
 	ActionStatus getStatus() const;
 	virtual void act(Session& sess)=0;
 	virtual std::string toString() const=0;
@@ -34,6 +35,7 @@ private:
 
 class CreateUser  : public BaseAction {
 public:
+    virtual ~CreateUser();
     CreateUser();
     CreateUser(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
@@ -43,6 +45,7 @@ public:
 
 class ChangeActiveUser : public BaseAction {
 public:
+    virtual ~ChangeActiveUser();
     ChangeActiveUser();
     ChangeActiveUser(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
@@ -52,6 +55,7 @@ public:
 
 class DeleteUser : public BaseAction {
 public:
+    virtual ~DeleteUser();
     DeleteUser();
     DeleteUser(std::string errorMsg,ActionStatus status);
 	virtual void act(Session & sess);
@@ -62,6 +66,7 @@ public:
 
 class DuplicateUser : public BaseAction {
 public:
+    virtual ~DuplicateUser();
     DuplicateUser();
     DuplicateUser(std::string errorMsg,ActionStatus status);
     virtual void act(Session & sess);
@@ -71,6 +76,7 @@ public:
 
 class PrintContentList : public BaseAction {
 public:
+    virtual ~PrintContentList();
     PrintContentList();
     PrintContentList(std::string errorMsg,ActionStatus status);
 	virtual void act (Session& sess);
@@ -80,6 +86,7 @@ public:
 
 class PrintWatchHistory : public BaseAction {
 public:
+    virtual ~PrintWatchHistory();
     PrintWatchHistory();
     PrintWatchHistory(std::string errorMsg,ActionStatus status);
     virtual void act (Session& sess);
@@ -90,6 +97,7 @@ public:
 
 class Watch : public BaseAction {
 public:
+    virtual ~Watch();
     Watch();
     Watch(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
@@ -100,6 +108,7 @@ public:
 
 class PrintActionsLog : public BaseAction {
 public:
+    virtual ~PrintActionsLog();
     PrintActionsLog();
     PrintActionsLog(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
@@ -109,6 +118,7 @@ public:
 
 class Exit : public BaseAction {
 public:
+    virtual ~Exit();
     Exit();
     Exit(std::string errorMsg,ActionStatus status);
     virtual void act(Session& sess);
