@@ -12,7 +12,6 @@ class Watchable;
 class Session{
 public:
     Session(const std::string &configFilePath);
-
     //5 Rule S
 
     Session(const Session& other);
@@ -39,12 +38,14 @@ public:
     void addToActionsLog(BaseAction* newAction);
     void addToUserMap(std::string name,User* newUserMap);
     bool deleteFromUserMap(std::string name);
+    void deleteUser();
     bool isUserExists(std::string& name);
 
     //setters
     void setActiveUser(User* user);
     void setCurrentCommand(std::string& currentCommand);
     void setIsRun(bool run);
+    void setUserMapHistory();
 
 private:
     std::vector<Watchable*> content;

@@ -79,8 +79,11 @@ void ChangeActiveUser::act(Session &sess) {
     sess.split(sess.getCurrentCommand(),words);
     if(words.size()==1) {
         std::string& name =  words.at(0);
-        User *user = sess.getUserFromMap(name)->clone();
+        User *user = sess.getUserFromMap(name);
         if(user!=nullptr){
+            sess.setUserMapHistory(); //update the copy in the usermap
+            sess.deleteUser();
+            user= sess.getUserFromMap(name)->clone();
             sess.setActiveUser(user);
             complete();
         }
@@ -199,10 +202,10 @@ Watch::Watch() :BaseAction(){}
 Watch::Watch(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void Watch::act(Session &sess) {
     std::vector<std::string> words;
-    sess.split(sess.getCurrentCommand(),words);
-    if(words.size()==1) {
+    sess.split(sess.getCurrentCommand(), words);
+    if (words.size() == 1) {
         std::string &idStr = words.at(0);
-        if(isNumber(idStr)) {
+        if (isNumber(idStr)) {
             Watchable *watch = sess.getContentByID(stoi(idStr));
             if (watch != nullptr) {
                 sess.getActiveUser().addToHistory(watch->clone());
@@ -211,9 +214,9 @@ void Watch::act(Session &sess) {
                 Watchable *nextWatch = sess.getActiveUser().getRecommendation(sess);
                 name = "We recommend watching " + nextWatch->toString() + ", continue watching? [y/n]";
                 std::cout << name << '\n';
-                char answer;
-                std::cin >> answer;
-                if (answer == 'y') {
+                std::string answer;
+                std::getline(std::cin, answer);
+                if (answer.compare("y")==0) {
                     name = std::to_string(nextWatch->getId());
                     sess.setCurrentCommand(name);
                     act(sess);
@@ -222,12 +225,12 @@ void Watch::act(Session &sess) {
             } else {
                 error(idStr + " is out of content bounds");
             }
-        }
-        else{
+        } else {
             error(idStr + " is not an integer");
         }
-    } else
+    } else {
         error("invalid input");
+    }
 }
 std::string Watch::toString() const { return "Watch"; }
 BaseAction* Watch::clone() {

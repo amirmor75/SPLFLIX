@@ -25,7 +25,7 @@ std::string Movie::getName() { return name;}
 
 bool Movie::isEpisode() { return false;}
 Watchable* Movie::clone() {
-    return  new Movie(*this);
+    return  new Movie(getId(),name,getLength(),getTags());
 }
 //Movie F
 
@@ -45,7 +45,9 @@ std::string Episode::getSeriesName() { return  seriesName;}
 long Episode::getNextEpisodeId() { return  nextEpisodeId;}
 int Episode::getEpisode() { return  episode;}
 int Episode::getSeason() { return season;}
-Watchable* Episode::clone() {return new Episode(*this);}
+Watchable* Episode::clone() {
+    return new Episode(getId(),getLength(),seriesName,season,episode,getTags());
+}
 //Episode F
 
 std::string Movie::toString() const {

@@ -10,8 +10,9 @@
 //User S
 User::User(const std::string &name): name(name),history(),lastrecommended(0){}
 User::User(std::vector<Watchable *> &hist, int lastRec, std::string &newName):lastrecommended(lastRec), name(newName) {
-    for(auto& watch: hist)
+    for(Watchable* watch: hist) {
         history.push_back(watch->clone());
+    }
 }
 std::vector<Watchable*> User::get_history() const {return history;}
 //5 Rule S
@@ -66,12 +67,13 @@ User& User::operator=(User &&other) {
 }
 //5 Rule F
 
-   
 void User::setName(std::string &newName) {
     name=newName;
 }
 std::string& User::getName() { return name;}
-void User::addToHistory(Watchable *watch) { history.push_back(watch); }
+void User::addToHistory(Watchable *watch) {
+    history.push_back(watch); //add to active user
+}
 
 //User F
 

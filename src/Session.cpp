@@ -148,16 +148,26 @@ void Session::setActiveUser(User* user) {
 void Session::addToUserMap(std::string name, User* newUserMap) {
     this->userMap.insert({name,newUserMap});
 }
+void Session::setUserMapHistory() {
+    for(Watchable* hist: getUserFromMap(activeUser->getName())->get_history())
+        delete hist;
+    getUserFromMap(activeUser->getName())->get_history().clear();
+    for(Watchable* hist: activeUser->get_history())
+        getUserFromMap(activeUser->getName())->get_history().push_back(hist->clone());
+
+}
 std::string& Session::getCurrentCommand() { return currentCommand;}
 void Session::setCurrentCommand(std::string& currentCommand) {this->currentCommand=currentCommand;}
 const int Session::getIndexOfContent() { return indexOfContent; }
 bool Session::getIsRun() const { return isRunning; }
 void Session::setIsRun(bool run) { isRunning=run; }
-
+void Session::deleteUser() { delete activeUser; }
 bool Session::deleteFromUserMap(std::string name) {
-    if(userMap.find(name)==userMap.end())
+    User* user=getUserFromMap(name);
+    if(user== nullptr)
         return false;
     else{
+        delete user;
         userMap.erase(name);
         return true;
     }
@@ -183,7 +193,7 @@ void Session::start() {
     BaseAction* baseAction;
     std::cout<<"SPLFLIX is now on!"<<'\n';
     activeUser=new LengthRecommenderUser("default");
-    //addToUserMap("default",activeUser);
+    addToUserMap("default",activeUser->clone());
     setIsRun(true);
     while(getIsRun()){
         std::getline(std::cin, currentCommand);
@@ -258,7 +268,6 @@ void Session::start() {
             addToActionsLog(baseAction);
         }
     }
-
 }
 
 
