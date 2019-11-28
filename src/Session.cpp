@@ -26,7 +26,7 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
         seasonIndex = 1;
         for (int season: element["seasons"]) {
             for (int i = 1; i <= season; i++) {
-                content.push_back(new Episode(content.size(), element["episode_length"], element["name"],seasonIndex,i, element["tags"]));
+                content.push_back(new Episode(content.size(), element["name"], element["episode_length"],seasonIndex,i, element["tags"]));
             }
             seasonIndex++;
         }
@@ -153,7 +153,7 @@ void Session::setUserMapHistory() {
         delete hist;
     getUserFromMap(activeUser->getName())->get_history().clear();
     for(Watchable* hist: activeUser->get_history())
-        getUserFromMap(activeUser->getName())->get_history().push_back(hist->clone());
+        getUserFromMap(activeUser->getName())->addToHistory(hist->clone());
 
 }
 std::string& Session::getCurrentCommand() { return currentCommand;}

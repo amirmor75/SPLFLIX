@@ -25,12 +25,12 @@ std::string Movie::getName() { return name;}
 
 bool Movie::isEpisode() { return false;}
 Watchable* Movie::clone() {
-    return  new Movie(getId(),name,getLength(),getTags());
+    return  new Movie(*this);
 }
 //Movie F
 
 //Episode S
-Episode::Episode(long id, int length, const std::string &seriesName, int season, int episode,
+Episode::Episode(long id, const std::string &seriesName, int length, int season, int episode,
                  const std::vector<std::string> &tags):Watchable(id,length,tags),seriesName(seriesName),season(season),episode(episode),nextEpisodeId(id+1) {}
 Episode::Episode(Episode &other):Watchable(other.getId(),other.getLength(),other.getTags()),seriesName(other.getSeriesName()),season(other.getSeason()),episode(other.getEpisode()), nextEpisodeId(other.nextEpisodeId){}
 Watchable* Episode::getNextWatchable(Session &s) const {
@@ -46,7 +46,7 @@ long Episode::getNextEpisodeId() { return  nextEpisodeId;}
 int Episode::getEpisode() { return  episode;}
 int Episode::getSeason() { return season;}
 Watchable* Episode::clone() {
-    return new Episode(getId(),getLength(),seriesName,season,episode,getTags());
+    return new Episode(*this);
 }
 //Episode F
 

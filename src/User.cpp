@@ -9,24 +9,25 @@
 
 //User S
 User::User(const std::string &name): name(name),history(),lastrecommended(0){}
-User::User(std::vector<Watchable *> &hist, int lastRec, std::string &newName):lastrecommended(lastRec), name(newName) {
+User::User(std::vector<Watchable*>& hist, int lastRec, std::string &newName):lastrecommended(lastRec), name(newName) {
     for(Watchable* watch: hist) {
-        history.push_back(watch->clone());
+        addToHistory(watch->clone());
     }
 }
 std::vector<Watchable*> User::get_history() const {return history;}
 //5 Rule S
 User::~User() {
-    for(Watchable* w:history){
-        delete w;
+    for(Watchable* hist:history){
+        delete hist;
     }
 }
 User::User(User &other){
     if(this != &other) {
         name=other.name;
         lastrecommended=other.lastrecommended;
-        for (Watchable *w: other.get_history())
-            this->history.push_back(w->clone());
+        for (Watchable* w: other.get_history()) {
+            history.push_back(w->clone());
+        }
     }
 }
 User::User(User &&other): name(other.name), lastrecommended(other.lastrecommended), history(other.history){
@@ -72,7 +73,7 @@ void User::setName(std::string &newName) {
 }
 std::string& User::getName() { return name;}
 void User::addToHistory(Watchable *watch) {
-    history.push_back(watch); //add to active user
+    history.push_back(watch);
 }
 
 //User F
@@ -80,6 +81,7 @@ void User::addToHistory(Watchable *watch) {
 //userLEN S
 LengthRecommenderUser::~LengthRecommenderUser() { }
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
+//LengthRecommenderUser::LengthRecommenderUser(LengthRecommenderUser &len):User(len.get_history(),len.lastrecommended,len.getName()) {}
 LengthRecommenderUser::LengthRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name) {}
 Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
@@ -115,6 +117,7 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
 }
 
 User* LengthRecommenderUser::clone() {
+    //return new LengthRecommenderUser(*this);
     return new LengthRecommenderUser(history,lastrecommended,getName());
 }
 //userLEN F
@@ -122,7 +125,8 @@ User* LengthRecommenderUser::clone() {
 
 //userRER S
 RerunRecommenderUser::~RerunRecommenderUser() { }
-RerunRecommenderUser::RerunRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name)  {}
+//RerunRecommenderUser::RerunRecommenderUser(RerunRecommenderUser &rer):User(rer) {}
+RerunRecommenderUser::RerunRecommenderUser(std::vector<Watchable *>& hist, int lastRec, std::string& name): User(hist,lastRec,name)  {}
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name): User(name){}
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
@@ -137,6 +141,7 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
 
 }
 User* RerunRecommenderUser::clone() {
+    //return new RerunRecommenderUser(*this);
     return new RerunRecommenderUser(history,lastrecommended,getName());
 }
 //userRER F
@@ -146,7 +151,8 @@ User* RerunRecommenderUser::clone() {
 
 //userGEN S
 GenreRecommenderUser::~GenreRecommenderUser() { }
-GenreRecommenderUser::GenreRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name)  {}
+//GenreRecommenderUser::GenreRecommenderUser(GenreRecommenderUser &gen):User(gen) {}
+GenreRecommenderUser::GenreRecommenderUser(std::vector<Watchable *>& hist, int lastRec, std::string &name): User(hist,lastRec,name)  {}
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}
 std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::string,int>& amountOfTags ) const {
     std::string popTag="";
@@ -211,6 +217,7 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
 }
 
 User* GenreRecommenderUser::clone() {
+    //return new GenreRecommenderUser(*this);
     return new GenreRecommenderUser(history,lastrecommended,getName());
 }
 //userGEN F

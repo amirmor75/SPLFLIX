@@ -83,8 +83,8 @@ void ChangeActiveUser::act(Session &sess) {
         if(user!=nullptr){
             sess.setUserMapHistory(); //update the copy in the usermap
             sess.deleteUser();
-            user= sess.getUserFromMap(name)->clone();
-            sess.setActiveUser(user);
+            user= sess.getUserFromMap(name);
+            sess.setActiveUser(user->clone());
             complete();
         }
         else
@@ -133,6 +133,7 @@ void DuplicateUser::act(Session &sess) {
     if(words.size()==2) {
         std::string &name = words.at(0);
         std::string &newName = words.at(1);
+        sess.setUserMapHistory(); //update the copy in the usermap
         User* user=sess.getUserFromMap(name);
         User* newUser=sess.getUserFromMap(newName);
         if(newUser== nullptr) {
