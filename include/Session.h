@@ -45,16 +45,15 @@ public:
     void setActiveUser(User* user);
     void setCurrentCommand(std::string& currentCommand);
     void setIsRun(bool run);
-    void setUserMapHistory();
+    //void setUserMapHistory();
 
 private:
     std::vector<Watchable*> content;
     std::vector<BaseAction*> actionsLog;
     std::unordered_map<std::string,User*> userMap;
-    User* activeUser;
+    User* activeUser; //point to a User in userMap- there is no need to delete this pointer.
     std::string currentCommand;//the command just written in the main
     int indexOfContent;//index of the current content the activeUser just watch
     bool isRunning;//if the main loop is still running
-
 };
 #endif
