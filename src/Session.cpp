@@ -1,6 +1,6 @@
 
 // Created by tal on 19/11/2019.
-//
+
 
 #include "../include/Session.h"
 #include "../include/json.hpp"
@@ -8,7 +8,6 @@
 #include "../include/Watchable.h"
 #include <iostream>
 
-//Session Constructor
 //Session Constructor
 Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand(""), isRunning(false) {
     using json= nlohmann::json;
@@ -120,7 +119,6 @@ Session::~Session() {
     for (auto& x: userMap) {
         delete x.second;
     }
-    delete activeUser;
 }
 //5 Rule F
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
@@ -148,14 +146,7 @@ void Session::setActiveUser(User* user) {
 void Session::addToUserMap(std::string name, User* newUserMap) {
     this->userMap.insert({name,newUserMap});
 }
-void Session::setUserMapHistory() {
-    for(Watchable* hist: getUserFromMap(activeUser->getName())->get_history())
-        delete hist;
-    getUserFromMap(activeUser->getName())->get_history().clear();
-    for(Watchable* hist: activeUser->get_history())
-        getUserFromMap(activeUser->getName())->addToHistory(hist->clone());
 
-}
 std::string& Session::getCurrentCommand() { return currentCommand;}
 void Session::setCurrentCommand(std::string& currentCommand) {this->currentCommand=currentCommand;}
 const int Session::getIndexOfContent() { return indexOfContent; }
@@ -192,8 +183,8 @@ void Session::start() {
     int firstSpace;
     BaseAction* baseAction;
     std::cout<<"SPLFLIX is now on!"<<'\n';
-    activeUser=new LengthRecommenderUser("default");
-    addToUserMap("default",activeUser->clone());
+    addToUserMap("default",new LengthRecommenderUser("default"));
+    setActiveUser(getUserFromMap("default"));
     setIsRun(true);
     while(getIsRun()){
         std::getline(std::cin, currentCommand);
@@ -266,6 +257,9 @@ void Session::start() {
             baseAction = new Exit();
             baseAction->act(*this);
             addToActionsLog(baseAction);
+        }
+        else{
+            std::cout<<"Unrecognized command- try again:"<<'\n';
         }
     }
 }

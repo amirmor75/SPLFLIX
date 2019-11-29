@@ -47,7 +47,6 @@ private:
 class LengthRecommenderUser : public User {
 public:
     virtual ~LengthRecommenderUser();
-    //LengthRecommenderUser(LengthRecommenderUser& len);
     LengthRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     LengthRecommenderUser(const std::string& name);
@@ -61,7 +60,6 @@ private:
 class RerunRecommenderUser : public User {
 public:
     virtual ~RerunRecommenderUser();
-    //RerunRecommenderUser(RerunRecommenderUser& rer);
     RerunRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     RerunRecommenderUser(const std::string& name);
@@ -76,7 +74,6 @@ private:
 class GenreRecommenderUser : public User {
 public:
     virtual ~GenreRecommenderUser();
-    //GenreRecommenderUser(GenreRecommenderUser& gen);
     GenreRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     GenreRecommenderUser(const std::string& name);

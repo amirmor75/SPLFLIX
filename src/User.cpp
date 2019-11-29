@@ -81,7 +81,6 @@ void User::addToHistory(Watchable *watch) {
 //userLEN S
 LengthRecommenderUser::~LengthRecommenderUser() { }
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
-//LengthRecommenderUser::LengthRecommenderUser(LengthRecommenderUser &len):User(len.get_history(),len.lastrecommended,len.getName()) {}
 LengthRecommenderUser::LengthRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name) {}
 Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
@@ -117,7 +116,6 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
 }
 
 User* LengthRecommenderUser::clone() {
-    //return new LengthRecommenderUser(*this);
     return new LengthRecommenderUser(history,lastrecommended,getName());
 }
 //userLEN F
@@ -125,7 +123,6 @@ User* LengthRecommenderUser::clone() {
 
 //userRER S
 RerunRecommenderUser::~RerunRecommenderUser() { }
-//RerunRecommenderUser::RerunRecommenderUser(RerunRecommenderUser &rer):User(rer) {}
 RerunRecommenderUser::RerunRecommenderUser(std::vector<Watchable *>& hist, int lastRec, std::string& name): User(hist,lastRec,name)  {}
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name): User(name){}
 Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
@@ -141,7 +138,6 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
 
 }
 User* RerunRecommenderUser::clone() {
-    //return new RerunRecommenderUser(*this);
     return new RerunRecommenderUser(history,lastrecommended,getName());
 }
 //userRER F
@@ -151,7 +147,6 @@ User* RerunRecommenderUser::clone() {
 
 //userGEN S
 GenreRecommenderUser::~GenreRecommenderUser() { }
-//GenreRecommenderUser::GenreRecommenderUser(GenreRecommenderUser &gen):User(gen) {}
 GenreRecommenderUser::GenreRecommenderUser(std::vector<Watchable *>& hist, int lastRec, std::string &name): User(hist,lastRec,name)  {}
 GenreRecommenderUser::GenreRecommenderUser(const std::string &name):User(name){}
 std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::string,int>& amountOfTags ) const {
@@ -217,7 +212,6 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
 }
 
 User* GenreRecommenderUser::clone() {
-    //return new GenreRecommenderUser(*this);
     return new GenreRecommenderUser(history,lastrecommended,getName());
 }
 //userGEN F

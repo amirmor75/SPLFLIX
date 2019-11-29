@@ -8,7 +8,7 @@
 class Session;
 
 //Watchable S
-Watchable::Watchable(long id, int length, const std::vector<std::string> &tags) : id(id), length(length),tags(std::move(tags)){}
+Watchable::Watchable(long newid, int newlength, const std::vector<std::string>& newtags) : id(newid), length(newlength),tags(newtags){}
 Watchable::~Watchable() = default;
 int Watchable::getLength() const{ return length; }
 const long& Watchable::getId() const { return id;}
@@ -35,7 +35,7 @@ Episode::Episode(long id, const std::string &seriesName, int length, int season,
 Episode::Episode(Episode &other):Watchable(other.getId(),other.getLength(),other.getTags()),seriesName(other.getSeriesName()),season(other.getSeason()),episode(other.getEpisode()), nextEpisodeId(other.nextEpisodeId){}
 Watchable* Episode::getNextWatchable(Session &s) const {
     const std::vector<Watchable*>& content=s.getContent();
-    if(content.at(nextEpisodeId)->isEpisode())
+    if(nextEpisodeId<content.size() && content.at(nextEpisodeId)->isEpisode())
         return content.at(nextEpisodeId);
     else
         return nullptr;

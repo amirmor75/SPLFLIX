@@ -56,12 +56,15 @@ void CreateUser::act(Session &sess) {
             }
             else{
                 error("invalid recommendation algorithm");
+                std::cout<<getErrorMsg()<<'\n';
             }
         } else {
             error("This name is already exists");
+            std::cout<<getErrorMsg()<<'\n';
         }
     } else {
         error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
     }
 }
 std::string CreateUser::toString() const { return "CreateUser"; }
@@ -81,17 +84,18 @@ void ChangeActiveUser::act(Session &sess) {
         std::string& name =  words.at(0);
         User *user = sess.getUserFromMap(name);
         if(user!=nullptr){
-            sess.setUserMapHistory(); //update the copy in the usermap
-            sess.deleteUser();
-            user= sess.getUserFromMap(name);
-            sess.setActiveUser(user->clone());
+            sess.setActiveUser(user);
             complete();
         }
-        else
-            error("user "+name+" is not exists");
+        else {
+            error("user " + name + " is not exists");
+            std::cout<<getErrorMsg()<<'\n';
+        }
     }
-    else
+    else {
         error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
+    }
 }
 std::string ChangeActiveUser::toString() const { return "ChangeActiveUser"; }
 BaseAction* ChangeActiveUser::clone() {
@@ -112,9 +116,12 @@ void DeleteUser::act(Session &sess) {
             complete();
         } else {
             error(name + " is not an exist user");
+            std::cout<<getErrorMsg()<<'\n';
         }
-    } else
+    } else {
         error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
+    }
 }
 std::string DeleteUser::toString() const { return "DeleteUser"; }
 BaseAction* DeleteUser::clone() {
@@ -133,7 +140,6 @@ void DuplicateUser::act(Session &sess) {
     if(words.size()==2) {
         std::string &name = words.at(0);
         std::string &newName = words.at(1);
-        sess.setUserMapHistory(); //update the copy in the usermap
         User* user=sess.getUserFromMap(name);
         User* newUser=sess.getUserFromMap(newName);
         if(newUser== nullptr) {
@@ -144,12 +150,16 @@ void DuplicateUser::act(Session &sess) {
                 complete();
             } else {
                 error(name + " is not an exist user");
+                std::cout<<getErrorMsg()<<'\n';
             }
         } else{
             error(newName + " is an exist user");
+            std::cout<<getErrorMsg()<<'\n';
         }
-    } else
+    } else {
         error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
+    }
 }
 std::string DuplicateUser::toString() const { return "DuplicateUser"; }
 BaseAction* DuplicateUser::clone() {
@@ -207,7 +217,7 @@ void Watch::act(Session &sess) {
     if (words.size() == 1) {
         std::string &idStr = words.at(0);
         if (isNumber(idStr)) {
-            Watchable *watch = sess.getContentByID(stoi(idStr));
+            Watchable *watch = sess.getContentByID(stoi(idStr)-1);
             if (watch != nullptr) {
                 sess.getActiveUser().addToHistory(watch->clone());
                 std::string name = "Watching " + watch->toString();
@@ -218,19 +228,22 @@ void Watch::act(Session &sess) {
                 std::string answer;
                 std::getline(std::cin, answer);
                 if (answer.compare("y")==0) {
-                    name = std::to_string(nextWatch->getId());
+                    name = std::to_string(nextWatch->getId()+1);
                     sess.setCurrentCommand(name);
                     act(sess);
                 }
                 complete();
             } else {
                 error(idStr + " is out of content bounds");
+                std::cout<<getErrorMsg()<<'\n';
             }
         } else {
             error(idStr + " is not an integer");
+            std::cout<<getErrorMsg()<<'\n';
         }
     } else {
         error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
     }
 }
 std::string Watch::toString() const { return "Watch"; }

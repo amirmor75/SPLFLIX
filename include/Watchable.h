@@ -25,9 +25,7 @@ public:
     const std::vector<std::string> & getTags() const;
     //getters
 
-    virtual std::string printAll() const = 0;    
-
-
+    virtual std::string printAll() const = 0;
     
 private:
     //given
