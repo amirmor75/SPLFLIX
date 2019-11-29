@@ -35,7 +35,6 @@ Session::Session(const std::string &configFilePath): content(), actionsLog(), us
 //5 Rule S
 //Session copy constructor
 Session::Session(const Session &other): content(), actionsLog(), userMap(), activeUser(), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent), isRunning(other.isRunning) {
-    activeUser=other.activeUser->clone();
     for(Watchable* watch: other.content)
         content.push_back(watch->clone());
 
@@ -45,6 +44,8 @@ Session::Session(const Session &other): content(), actionsLog(), userMap(), acti
     for (auto& x: other.userMap) {
         userMap.insert({x.first,x.second->clone()});
     }
+    if(other.getPointerActiveUser()!= nullptr)//if there is no user exits yet
+        setActiveUser(getUserFromMap(other.getActiveUser().getName()));
 }
 
 Session::Session(Session&& other): content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), activeUser(other.activeUser), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent), isRunning(other.isRunning) {
@@ -63,8 +64,6 @@ Session& Session::operator=(Session& other) {
         indexOfContent=other.indexOfContent;
         currentCommand=other.currentCommand;
         indexOfContent=other.indexOfContent;
-        delete activeUser;
-        activeUser=other.activeUser->clone();
         for(Watchable* watch: content)
             delete watch;
         content.clear();
@@ -84,29 +83,31 @@ Session& Session::operator=(Session& other) {
         for (auto& x: other.userMap) {
             userMap.insert({x.first,x.second->clone()});
         }
+        if(other.getPointerActiveUser()!= nullptr)//if there is no user exits yet
+            setActiveUser(getUserFromMap(other.getActiveUser().getName()));
     }
     return (*this);
 }
 
 Session& Session::operator=(Session &&other) {
-        indexOfContent=other.indexOfContent;
-        currentCommand=other.currentCommand;
-        indexOfContent=other.indexOfContent;
-        delete activeUser;
-        activeUser=other.activeUser;
+    indexOfContent=other.indexOfContent;
+    currentCommand=other.currentCommand;
+    indexOfContent=other.indexOfContent;
+    for(Watchable* watch: content)
+        delete watch;
+    content=other.content; //shallow copy
 
-        for(Watchable* watch: content)
-            delete watch;
-        content=other.content; //shallow copy
+    for(BaseAction* base:actionsLog)
+        delete base;
+    actionsLog=other.actionsLog; //shallow copy
 
-        for(BaseAction* base:actionsLog)
-            delete base;
-        actionsLog=other.actionsLog; //shallow copy
+    for (auto& x: userMap)
+        delete x.second;
 
-        for (auto& x: userMap) {
-            delete x.second;
-        }
-        userMap=other.userMap; //shallow copy
+    userMap=other.userMap; //shallow copy
+    if(other.getPointerActiveUser()!= nullptr)//if there is no user exits yet
+        setActiveUser(getUserFromMap(other.getActiveUser().getName()));
+
     return (*this);
 }
 
@@ -122,6 +123,7 @@ Session::~Session() {
 //5 Rule F
 const std::vector<BaseAction*>& Session::getActionsLog() { return actionsLog;}
 User& Session::getActiveUser() const{ return  *activeUser;}
+User* Session::getPointerActiveUser() const { return activeUser; }
 const std::vector<Watchable*>& Session::getContent() { return  content;}
 User* Session::getUserFromMap(std::string name) {
     if(isUserExists(name))
@@ -182,7 +184,8 @@ void Session::start() {
     size_t firstSpace;
     BaseAction* baseAction;
     std::cout<<"SPLFLIX is now on!"<<'\n';
-    addToUserMap("default",new LengthRecommenderUser("default"));
+    if(getUserFromMap("default")==nullptr) //if there will be use in copy constructor of Session- the default user is defaultly exists in the new session
+        addToUserMap("default",new LengthRecommenderUser("default"));
     setActiveUser(getUserFromMap("default"));
     setIsRun(true);
     while(getIsRun()){

@@ -30,6 +30,7 @@ public:
     const std::vector<BaseAction*>& getActionsLog();
     User* getUserFromMap(std::string name);
     User& getActiveUser() const;
+    User* getPointerActiveUser() const;
     std::string& getCurrentCommand();
     const int getIndexOfContent();
     bool getIsRun() const;

@@ -58,6 +58,7 @@ private:
 
 class Episode: public Watchable{
 public:
+    Episode(long id, const std::string& seriesName,int length, int season, int episode ,const std::vector<std::string>& tags,long nextEp);
     //given
     Episode(long id, const std::string& seriesName,int length, int season, int episode ,const std::vector<std::string>& tags);
     virtual std::string toString() const;

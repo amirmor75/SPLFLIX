@@ -173,13 +173,22 @@ PrintContentList::~PrintContentList() { }
 PrintContentList::PrintContentList() :BaseAction(){}
 PrintContentList::PrintContentList(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void PrintContentList::act(Session &sess) {
-    int index=1;
-    std::string str="";
-    for(auto& watch: sess.getContent()) {
-        printf("%d. %s %s \n",index,watch->toString().c_str(),watch->printAll().c_str());
-        index++;
+    std::string& command=sess.getCurrentCommand();
+    std::vector<std::string> words;
+    sess.split(command,words);
+    if(words.size()==1) {
+        int index = 1;
+        std::string str = "";
+        for (auto &watch: sess.getContent()) {
+            printf("%d. %s %s \n", index, watch->toString().c_str(), watch->printAll().c_str());
+            index++;
+        }
+        complete();
     }
-    complete();
+    else{
+        error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
+    }
 }
 std::string PrintContentList::toString() const { return "PrintContentList"; }
 BaseAction* PrintContentList::clone() {
@@ -193,12 +202,21 @@ PrintWatchHistory::~PrintWatchHistory() { }
 PrintWatchHistory::PrintWatchHistory() :BaseAction(){}
 PrintWatchHistory::PrintWatchHistory(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void PrintWatchHistory::act(Session &sess) {
-    int index=1;
-    for(auto& watch: sess.getActiveUser().get_history()) {
-        printf("%d. %s \n",index,watch->toString().c_str());
-        index++;
+    std::string& command=sess.getCurrentCommand();
+    std::vector<std::string> words;
+    sess.split(command,words);
+    if(words.size()==1) {
+        int index=1;
+        for(auto& watch: sess.getActiveUser().get_history()) {
+            printf("%d. %s \n",index,watch->toString().c_str());
+            index++;
+        }
+        complete();
     }
-    complete();
+    else{
+        error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
+    }
 }
 std::string PrintWatchHistory::toString() const { return "PrintWatchHistory"; }
 BaseAction* PrintWatchHistory::clone() {
@@ -258,28 +276,36 @@ PrintActionsLog::~PrintActionsLog() { }
 PrintActionsLog::PrintActionsLog() :BaseAction(){}
 PrintActionsLog::PrintActionsLog(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void PrintActionsLog::act(Session &sess) {
-    std::string str,status,error;
-    for(auto& action: sess.getActionsLog()) {
-        str=action->toString()+" ";
-        switch (action->getStatus()){
-            case COMPLETED:
-                status="COMPLETED";
-                break;
-            case PENDING:
-                status="PENDING";
-                break;
-            case ERROR:
-                status="ERROR";
-                break;
+    std::string& command=sess.getCurrentCommand();
+    std::vector<std::string> words;
+    sess.split(command,words);
+    if(words.size()==1) {
+        std::string str, status, error;
+        for (auto &action: sess.getActionsLog()) {
+            str = action->toString() + " ";
+            switch (action->getStatus()) {
+                case COMPLETED:
+                    status = "COMPLETED";
+                    break;
+                case PENDING:
+                    status = "PENDING";
+                    break;
+                case ERROR:
+                    status = "ERROR";
+                    break;
+            }
+            if (status.compare("ERROR") == 0)
+                error = " " + action->getErrorMsgPublic();
+            else
+                error = "";
+            str += status + error;
+            std::cout << str << '\n';
         }
-        if(status.compare("ERROR")==0)
-            error = " " + action->getErrorMsgPublic();
-        else
-            error="";
-        str+=status+error;
-        std::cout << str << '\n';
+        complete();
+    } else {
+        error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
     }
-    complete();
 }
 std::string PrintActionsLog::toString() const { return "PrintActionsLog"; }
 BaseAction* PrintActionsLog::clone() {
@@ -293,8 +319,17 @@ Exit::~Exit() { }
 Exit::Exit() :BaseAction(){}
 Exit::Exit(std::string errorMsg, ActionStatus status):BaseAction(errorMsg,status) {}
 void Exit::act(Session &sess) {
-    sess.setIsRun(false);
-    complete();
+    std::string& command=sess.getCurrentCommand();
+    std::vector<std::string> words;
+    sess.split(command,words);
+    if(words.size()==1) {
+        sess.setIsRun(false);
+        complete();
+    }
+    else {
+        error("invalid input");
+        std::cout<<getErrorMsg()<<'\n';
+    }
 }
 std::string Exit::toString() const { return "Exit"; }
 BaseAction* Exit::clone() {
