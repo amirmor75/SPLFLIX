@@ -9,7 +9,7 @@
 #include <iostream>
 
 //Session Constructor
-Session::Session(const std::string &configFilePath):indexOfContent(0),currentCommand(""), isRunning(false) {
+Session::Session(const std::string &configFilePath): content(), actionsLog(), userMap(), activeUser(),currentCommand(""), indexOfContent(0), isRunning(false) {
     using json= nlohmann::json;
     json j;
     std::ifstream file(configFilePath);
@@ -34,7 +34,7 @@ Session::Session(const std::string &configFilePath):indexOfContent(0),currentCom
 
 //5 Rule S
 //Session copy constructor
-Session::Session(const Session &other): isRunning(other.isRunning), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent),content(),actionsLog(),userMap(),activeUser() {
+Session::Session(const Session &other): content(), actionsLog(), userMap(), activeUser(), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent), isRunning(other.isRunning) {
     activeUser=other.activeUser->clone();
     for(Watchable* watch: other.content)
         content.push_back(watch->clone());
@@ -47,13 +47,12 @@ Session::Session(const Session &other): isRunning(other.isRunning), currentComma
     }
 }
 
-Session::Session(Session&& other):
-activeUser(other.activeUser),content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), indexOfContent(other.indexOfContent), currentCommand(other.currentCommand), isRunning(other.isRunning) {
+Session::Session(Session&& other): content(other.content), actionsLog(other.actionsLog), userMap(other.userMap), activeUser(other.activeUser), currentCommand(other.currentCommand), indexOfContent(other.indexOfContent), isRunning(other.isRunning) {
     other.activeUser= nullptr;
-    for(Watchable* watch:other.content)
-        watch= nullptr;
-    for(BaseAction* base:other.actionsLog)
-        base= nullptr;
+    for(std::vector<Watchable*>::iterator iter=other.content.begin();iter!=other.content.end();iter++)
+        *iter=nullptr;
+    for(std::vector<BaseAction*>::iterator iter=other.actionsLog.begin();iter!=other.actionsLog.end();iter++)
+        *iter=nullptr;
     for (auto& x: other.userMap) {
         x.second= nullptr;
     }
@@ -180,7 +179,7 @@ void Session::split(std::string &str, std::vector<std::string> &out) {
 
 void Session::start() {
     std::vector<std::string> command;
-    int firstSpace;
+    size_t firstSpace;
     BaseAction* baseAction;
     std::cout<<"SPLFLIX is now on!"<<'\n';
     addToUserMap("default",new LengthRecommenderUser("default"));
@@ -204,7 +203,7 @@ void Session::start() {
         }
         else if(command.at(0).compare("changeuser")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace < (signed)currentCommand.size()) {
+            if (firstSpace < currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new ChangeActiveUser();
                 baseAction->act(*this);
@@ -213,7 +212,7 @@ void Session::start() {
         }
         else if(command.at(0).compare("deleteuser")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace < (signed)currentCommand.size()) {
+            if (firstSpace < currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new DeleteUser();
                 baseAction->act(*this);
@@ -222,7 +221,7 @@ void Session::start() {
         }
         else if(command.at(0).compare("dupuser")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace < (signed)currentCommand.size()) {
+            if (firstSpace < currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new DuplicateUser();
                 baseAction->act(*this);
@@ -241,7 +240,7 @@ void Session::start() {
         }
         else if(command.at(0).compare("watch")==0) {
             firstSpace = currentCommand.find(" ");
-            if (firstSpace <= (signed)currentCommand.size()) {
+            if (firstSpace <= currentCommand.size()) {
                 currentCommand = currentCommand.substr(firstSpace + 1);
                 baseAction = new Watch();
                 baseAction->act(*this);
