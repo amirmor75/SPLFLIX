@@ -8,8 +8,8 @@
 #include "../include/Session.h"
 
 //User S
-User::User(const std::string &name): name(name),history(),lastrecommended(0){}
-User::User(std::vector<Watchable*>& hist, int lastRec, std::string &newName):lastrecommended(lastRec), name(newName) {
+User::User(const std::string &name):history(),lastrecommended(0), name(name){}
+User::User(std::vector<Watchable*>& hist, int lastRec, std::string &newName):history(),lastrecommended(lastRec), name(newName) {
     for(Watchable* watch: hist) {
         addToHistory(watch->clone());
     }
@@ -21,17 +21,15 @@ User::~User() {
         delete hist;
     }
 }
-User::User(User &other){
+User::User(User &other):history(),lastrecommended(other.lastrecommended), name(other.name){
     if(this != &other) {
-        name=other.name;
-        lastrecommended=other.lastrecommended;
         for (Watchable* w: other.get_history()) {
             history.push_back(w->clone());
         }
     }
 }
-User::User(User &&other): name(other.name), lastrecommended(other.lastrecommended), history(other.history){
-    for(int i=0;i<other.history.size();i++){
+User::User(User &&other): history(other.history),lastrecommended(other.lastrecommended), name(other.name){
+    for(size_t i=0;i<other.history.size();i++){
         other.history.at(i)= nullptr;
     }
     other.history.clear();
@@ -43,7 +41,7 @@ User& User::operator=(User &other) {
         for(Watchable* w: this->history)
             delete w;
         history.clear();
-        for (int i = 0; i < other.history.size(); i++)
+        for (size_t i = 0; i < other.history.size(); i++)
             this->history.push_back(other.history.at(i)->clone());
     }
     return (*this);
@@ -97,9 +95,9 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
             Watchable *tempMin = nullptr;
             bool watched = false;
             bool tempIsNull = true;
-            for (int i = 0; i < content.size(); ++i) {
+            for (size_t i = 0; i < content.size(); ++i) {
                 if (tempIsNull || abs(avgLength - content.at(i)->getLength()) < abs(avgLength - tempMin->getLength())) {
-                    for (int k = 0; k < history.size() && !watched; ++k) {
+                    for (size_t k = 0; k < history.size() && !watched; ++k) {
                         if (this->history.at(k) == tempMin)
                             watched = true;
                     }
