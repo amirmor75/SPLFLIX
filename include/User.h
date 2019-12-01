@@ -31,8 +31,9 @@ public:
     virtual User* clone()=0;
     void addToHistory(Watchable* watch);
     void setName(std::string & name);
+    void setLastRec(int i);
     std::string& getName();
-
+    bool isInHistory(Watchable& watch) const;
 
     // all is given
     protected:

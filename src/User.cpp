@@ -73,6 +73,16 @@ std::string& User::getName() { return name;}
 void User::addToHistory(Watchable *watch) {
     history.push_back(watch);
 }
+bool User::isInHistory(Watchable &watch) const {
+    bool watched=false;
+    for (size_t k = 0; k < history.size() && !watched; k++) { //checks if content exists in the history
+        if (this->history.at(k)->getId()==watch.getId()) {
+            watched = true;
+        }
+    }
+    return watched;
+}
+void User::setLastRec(int i) { lastrecommended=i; }
 
 //User F
 
@@ -91,17 +101,13 @@ Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
             for (Watchable *c : history) {
                 sum = sum + c->getLength();
             }
-            double avgLength = sum / history.size();
+            double avgLength = sum / history.size(); //the avg length of content in history
+
             Watchable *tempMin = nullptr;
-            bool watched = false;
             bool tempIsNull = true;
-            for (size_t i = 0; i < content.size(); ++i) {
+            for (size_t i = 0; i < content.size(); i++) {
                 if (tempIsNull || abs(avgLength - content.at(i)->getLength()) < abs(avgLength - tempMin->getLength())) {
-                    for (size_t k = 0; k < history.size() && !watched; ++k) {
-                        if (this->history.at(k) == tempMin)
-                            watched = true;
-                    }
-                    if (!watched) {
+                    if (!isInHistory(*content.at(i))) {
                         tempMin = content.at(i);
                         tempIsNull = false;
                     }
@@ -128,12 +134,21 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
     if(nextEpisode!= nullptr){
         return nextEpisode;
     } else {
-        if (history.size()!=0)
-            return history.at(lastrecommended%history.size());
+        if (history.size()!=0) {
+            int i=0;
+            bool found=false;
+            for(size_t k = 0; k < history.size() && !found; k++)
+            {
+                if(lastrecommended==history.at(k)->getId()) {
+                    i = k;
+                    found=true;
+                }
+            }
+            return history.at((i+1) % history.size());
+        }
         else
             return nullptr;
     }
-
 }
 User* RerunRecommenderUser::clone() {
     return new RerunRecommenderUser(history,lastrecommended,getName());
@@ -167,6 +182,7 @@ std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::stri
             }
         }
     }
+    printf("pop tag is %s \n",popTag.c_str());
     return popTag;
 }
 Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
@@ -185,24 +201,18 @@ Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
             }
         }
         //init of TagMap F
-        const std::vector<Watchable *> &content = s.getContent();
 
-        std::string s=mostPopTag(tagMap);//first poptag
-        bool beenWatched= false;
-        while (s.compare("")!=0 ) {
-            for (Watchable *show:content) {
-                for (Watchable *watched:history) {//checks if show been watched
-                    if (watched==show)
-                        beenWatched = true;
-                }
-                if (!beenWatched) {
+        std::string pop=mostPopTag(tagMap);//first poptag
+        while (pop.compare("")!=0 ) {
+            for (Watchable *show:  s.getContent()) {
+                if (!isInHistory(*show)) {
                     for (std::string tag:show->getTags()) {//checks if show has relevant tag
-                        if (s.compare(tag) == 0)
+                        if (pop.compare(tag) == 0)
                             return show;
                     }
                 }
             }
-            tagMap.erase(s);
+            tagMap.erase(pop);
             s=mostPopTag(tagMap);
         }
     }

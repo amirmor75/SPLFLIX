@@ -241,16 +241,22 @@ void Watch::act(Session &sess) {
                 std::string name = "Watching " + watch->toString();
                 std::cout << name << '\n';
                 Watchable *nextWatch = sess.getActiveUser().getRecommendation(sess);
-                name = "We recommend watching " + nextWatch->toString() + ", continue watching? [y/n]";
-                std::cout << name << '\n';
-                std::string answer;
-                std::getline(std::cin, answer);
-                if (answer.compare("y")==0) {
-                    name = std::to_string(nextWatch->getId()+1);
-                    sess.setCurrentCommand(name);
-                    act(sess);
+                if(nextWatch!=nullptr) {
+                    sess.getActiveUser().setLastRec(nextWatch->getId());
+                    name = "We recommend watching " + nextWatch->toString() + ", continue watching? [y/n]";
+                    std::cout << name << '\n';
+                    std::string answer;
+                    std::getline(std::cin, answer);
+                    if (answer.compare("y") == 0) {
+                        name = std::to_string(nextWatch->getId() + 1);
+                        sess.setCurrentCommand(name);
+                        act(sess);
+                    }
+                    complete();
+                } else{
+                    error("There is no available content to offer");
+                    std::cout<<getErrorMsg()<<'\n';
                 }
-                complete();
             } else {
                 error(idStr + " is out of content bounds");
                 std::cout<<getErrorMsg()<<'\n';
