@@ -9,7 +9,7 @@ int main(int argc, char** argv){
 //        return 0;
 //    }
 //    Session s(argv[1]);
-    Session s("/home/tal/Desktop/config2.json");
+    Session s("/home/amir/CLionProjects/SPLFLIX/include/config1.json");
     s.start();
 
     return 0;
