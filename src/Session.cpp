@@ -153,7 +153,6 @@ void Session::setCurrentCommand(std::string& currentCommand) {this->currentComma
 const int Session::getIndexOfContent() { return indexOfContent; }
 bool Session::getIsRun() const { return isRunning; }
 void Session::setIsRun(bool run) { isRunning=run; }
-void Session::deleteUser() { delete activeUser; }
 bool Session::deleteFromUserMap(std::string name) {
     User* user=getUserFromMap(name);
     if(user== nullptr)

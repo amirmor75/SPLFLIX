@@ -39,7 +39,6 @@ public:
     void addToActionsLog(BaseAction* newAction);
     void addToUserMap(std::string name,User* newUserMap);
     bool deleteFromUserMap(std::string name);
-    void deleteUser();
     bool isUserExists(std::string& name);
 
     //setters

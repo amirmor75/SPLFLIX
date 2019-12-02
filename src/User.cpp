@@ -183,7 +183,6 @@ std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::stri
             }
         }
     }
-    // printf("pop tag is %s \n",popTag.c_str());
     return popTag;
 }
 Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
