@@ -13,8 +13,7 @@ class Episode;
 class Session;
 
 class User{
-public:
-
+    public:
     User(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     User(const std::string& name);
@@ -31,15 +30,15 @@ public:
     virtual User* clone()=0;
     void addToHistory(Watchable* watch);
     void setName(std::string & name);
-    void setLastRec(int i);
+    void setLastRec(long i);
     std::string& getName();
     bool isInHistory(Watchable& watch) const;
 
     // all is given
     protected:
     std::vector<Watchable*> history;
-    int lastrecommended;
-private:
+    int lastRecommended;
+    private:
     std::string name;
     //all is give
 };
@@ -66,9 +65,7 @@ public:
     RerunRecommenderUser(const std::string& name);
     virtual Watchable *getRecommendation(Session &s) const ;
     //given
-    virtual User* clone();      
-
-
+    virtual User* clone();
 private:
 };
 
