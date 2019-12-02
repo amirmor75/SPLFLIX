@@ -90,7 +90,7 @@ void User::setLastRec(long i) { lastRecommended=i;}
 LengthRecommenderUser::~LengthRecommenderUser() { }
 LengthRecommenderUser::LengthRecommenderUser(const std::string &name): User(name){}
 LengthRecommenderUser::LengthRecommenderUser(std::vector<Watchable *> &hist, int lastRec, std::string &name): User(hist,lastRec,name) {}
-Watchable* LengthRecommenderUser::getRecommendation(Session &s) const {
+Watchable* LengthRecommenderUser::getRecommendation(Session &s) {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
     if(nextEpisode!= nullptr){
         return nextEpisode;
@@ -129,7 +129,7 @@ User* LengthRecommenderUser::clone() {
 RerunRecommenderUser::~RerunRecommenderUser() { }
 RerunRecommenderUser::RerunRecommenderUser(std::vector<Watchable *>& hist, int lastRec, std::string& name): User(hist,lastRec,name)  {}
 RerunRecommenderUser::RerunRecommenderUser(const std::string &name): User(name){}
-Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
+Watchable* RerunRecommenderUser::getRecommendation(Session &s) {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);
     if(nextEpisode!= nullptr){
         return nextEpisode;
@@ -185,7 +185,7 @@ std::string GenreRecommenderUser::mostPopTag( const std::unordered_map<std::stri
     }
     return popTag;
 }
-Watchable* GenreRecommenderUser::getRecommendation(Session &s) const {
+Watchable* GenreRecommenderUser::getRecommendation(Session &s) {
     Watchable* nextEpisode=history.at(history.size()-1)->getNextWatchable(s);// gets next episode of series or null.
     if(nextEpisode!= nullptr){// no next episode
         return nextEpisode;

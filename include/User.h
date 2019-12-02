@@ -17,8 +17,9 @@ class User{
     User(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     User(const std::string& name);
-    virtual Watchable *getRecommendation(Session &s) const = 0;
+    virtual Watchable *getRecommendation(Session &s) = 0;
     std::vector<Watchable*> get_history() const;
+    std::string& getName();
     //given
     //5 Rule S
     virtual ~User();
@@ -31,7 +32,6 @@ class User{
     void addToHistory(Watchable* watch);
     void setName(std::string & name);
     void setLastRec(long i);
-    std::string& getName();
     bool isInHistory(Watchable& watch) const;
 
     // all is given
@@ -50,7 +50,7 @@ public:
     LengthRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     LengthRecommenderUser(const std::string& name);
-    virtual Watchable *getRecommendation(Session &s) const;
+    virtual Watchable *getRecommendation(Session &s);
     //given
     virtual User* clone();
 
@@ -63,7 +63,7 @@ public:
     RerunRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     RerunRecommenderUser(const std::string& name);
-    virtual Watchable *getRecommendation(Session &s) const ;
+    virtual Watchable *getRecommendation(Session &s) ;
     //given
     virtual User* clone();
 private:
@@ -75,7 +75,7 @@ public:
     GenreRecommenderUser(std::vector<Watchable*>& hist, int lastRec, std::string& name);
     //given
     GenreRecommenderUser(const std::string& name);
-    virtual Watchable *getRecommendation(Session &s) const;
+    virtual Watchable *getRecommendation(Session &s);
     //given
     virtual User* clone();
     std::string mostPopTag(const std::unordered_map<std::string,int>& tagMap) const;    
