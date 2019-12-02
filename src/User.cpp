@@ -8,7 +8,7 @@
 #include "../include/Session.h"
 
 //User S
-User::User(const std::string &name):history(),lastRecommended(0), name(name){}
+User::User(const std::string &name):history(),lastRecommended(1), name(name){}
 User::User(std::vector<Watchable*>& hist, int lastRec, std::string &newName):history(),lastRecommended(lastRec), name(newName) {
     for(Watchable* watch: hist) {
         addToHistory(watch->clone());
@@ -82,7 +82,7 @@ bool User::isInHistory(Watchable &watch) const {
     }
     return watched;
 }
-void User::setLastRec(int i) { lastRecommended=i; }
+void User::setLastRec(long i) { lastRecommended=i;}
 
 //User F
 
@@ -139,12 +139,11 @@ Watchable* RerunRecommenderUser::getRecommendation(Session &s) const {
             bool found=false;
             for(size_t k = 0; k < history.size() && !found; k++)
             {
-                if(lastRecommended==history.at(k)->getId()) {
+                if(lastRecommended==history.at(k)->getId()) { // index of last recommended in history
                     i = k;
                     found=true;
                 }
             }
-
             return history.at((i+1) % history.size());
         }
         else

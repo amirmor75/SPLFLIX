@@ -242,8 +242,8 @@ void Watch::act(Session &sess) {
                 std::cout << name << '\n';
                 Watchable *nextWatch = sess.getActiveUser().getRecommendation(sess);
                 if(nextWatch!=nullptr) {
-                    sess.getActiveUser().setLastRec(nextWatch->getId());
                     name = "We recommend watching " + nextWatch->toString() + ", continue watching? [y/n]";
+                    sess.getActiveUser().setLastRec(nextWatch->getId());
                     std::cout << name << '\n';
                     std::string answer;
                     std::getline(std::cin, answer);
